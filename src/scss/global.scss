@@ -3,3 +3,8 @@
 @tailwind utilities;
 
 @import 'reset';
+
+.gradient-background {
+  background: radial-gradient(circle 400px at 30% 120%, rgba(83, 77, 177, 0.2) 0%, rgba(255, 255, 255, 0) 100%),
+    radial-gradient(circle 300px at 70% -10%, rgba(76, 63, 253, 0.2) 0%, rgba(255, 255, 255, 0) 100%);
+}
