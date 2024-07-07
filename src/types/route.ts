@@ -6,5 +6,30 @@ export enum Route {
   CHECKIN = 'check-in',
   WALLET = 'wallet',
   ANALYTICS = 'analytics',
-  USERMANAGEMENT = 'user-management',
+  USER_MANAGEMENT = 'user-management',
+  PAYMENT_LOGS = 'payment-logs',
+}
+
+export enum RouteQuery {
+  TAB = 'tab',
+}
+
+export enum EventTab {
+  ONGOING = 'ongoing',
+  UPCOMING = 'upcoming',
+}
+
+export enum CheckInTab {
+  SCANNER = 'scanner',
+  MANUAL = 'manual',
+}
+
+export enum PaymentLogsTab {
+  ALL = 'all',
+  FAILED = 'failed',
+}
+
+export enum AnalyticsTab {
+  EVENTS = 'events',
+  PAYMENT = 'payment',
 }

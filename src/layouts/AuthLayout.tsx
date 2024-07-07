@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 
 const AuthLayout: FunctionComponent = () => {
   return (
-    <main className="gradient-background flex h-screen flex-col">
+    <main className="gradient-background flex h-screen flex-col items-center justify-center">
       <Outlet />
     </main>
   );

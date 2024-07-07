@@ -8,6 +8,7 @@ import Events from './pages/Events';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
 import Otp from './pages/Otp';
+import PaymentLogs from './pages/PaymentLogs';
 import Signup from './pages/Signup';
 import UserManagement from './pages/UserManagement';
 import Wallet from './pages/Wallet';
@@ -32,7 +33,7 @@ const appRouter = createBrowserRouter([
             element: <Login />,
           },
           {
-            path: Route.OTP,
+            path: `${Route.OTP}/:otp_token`,
             element: <Otp />,
           },
           {
@@ -62,7 +63,11 @@ const appRouter = createBrowserRouter([
             element: <Analytics />,
           },
           {
-            path: Route.USERMANAGEMENT,
+            path: Route.PAYMENT_LOGS,
+            element: <PaymentLogs />,
+          },
+          {
+            path: Route.USER_MANAGEMENT,
             element: <UserManagement />,
           },
         ],
