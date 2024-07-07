@@ -9,7 +9,7 @@ function App() {
   useEffect(() => {
     if ('serviceWorker' in navigator && 'PushManager' in window) {
       navigator.serviceWorker
-        .register('./sw.js')
+        .register('/sw.js')
         .then((swReg) => {
           console.log('Service Worker registered', swReg);
 
