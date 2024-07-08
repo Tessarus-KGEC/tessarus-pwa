@@ -4,7 +4,7 @@ import { RouterProvider } from 'react-router-dom';
 import { appRouter } from './Route';
 
 function App() {
-  const [pwaDefferedPrompt, setPwaDefferedPrompt] = useState<Event | null>(null);
+  const [pwaDefferedPrompt] = useState<Event | null>(null);
   console.log('🚀 ~ App ~ pwaDefferedPrompt:', pwaDefferedPrompt);
   useEffect(() => {
     if ('serviceWorker' in navigator && 'PushManager' in window) {
