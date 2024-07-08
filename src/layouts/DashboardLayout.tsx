@@ -3,9 +3,10 @@ import gsap from 'gsap';
 import { FunctionComponent, useCallback } from 'react';
 import { IoAnalyticsOutline, IoCloseOutline, IoDocumentTextOutline, IoMenuOutline, IoScanOutline, IoWalletOutline } from 'react-icons/io5';
 import { MdOutlineAdminPanelSettings, MdOutlineEvent } from 'react-icons/md';
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useNavigate } from 'react-router-dom';
 
 import EspektroLogo from '@/assets/logo/Espektro logo fill.svg';
+import ProtectedLayout from '@/components/Protected';
 import { RoutePath } from '@/constants/route';
 import { useAppDispatch, useAppSelector } from '@/redux';
 import { logout } from '@/redux/reducers/auth.reducer';
@@ -66,7 +67,7 @@ const ProfileDropdown = () => {
   const dispatch = useAppDispatch();
 
   return (
-    <Dropdown>
+    <Dropdown className="text-foreground dark">
       <DropdownTrigger>
         <Avatar isBordered radius="full" color="secondary" src="https://i.pravatar.cc/150?u=a042581f4e29026704d" className="h-9 w-9 cursor-pointer" />
       </DropdownTrigger>
@@ -118,16 +119,19 @@ const Sidebar: FunctionComponent<{
       </div>
       <div className="px-4">
         <ul className="flex flex-col gap-2">
-          {navlinks.map((link) => (
-            <Link to={`/dashboard/${link.route}`}>
-              <div
-                className={`flex items-center gap-2 rounded-xl px-4 py-2 ${isActiveRoute(link.route) ? 'bg-default-200 text-default-600' : 'text-default-500'} hover:bg-default-200 hover:text-default-600`}
-              >
-                <span>{link.icon}</span>
-                {link.title}
-              </div>
-            </Link>
-          ))}
+          {navlinks.map((link) => {
+            if (link.status === 'inactive') return null;
+            return (
+              <Link to={`/dashboard/${link.route}`}>
+                <div
+                  className={`flex items-center gap-2 rounded-xl px-4 py-2 ${isActiveRoute(link.route) ? 'bg-default-200 text-default-600' : 'text-default-500'} hover:bg-default-200 hover:text-default-600`}
+                >
+                  <span>{link.icon}</span>
+                  {link.title}
+                </div>
+              </Link>
+            );
+          })}
         </ul>
       </div>
     </nav>
@@ -135,6 +139,7 @@ const Sidebar: FunctionComponent<{
 };
 
 const DashboardLayout: FunctionComponent = () => {
+  const navigate = useNavigate();
   const { isLoggedIn, user } = useAppSelector((state) => state.auth);
   const { contextSafe } = useGSAP();
   const handleSideBarOpen = contextSafe(() => {
@@ -151,56 +156,64 @@ const DashboardLayout: FunctionComponent = () => {
   });
   return (
     <RouteWrapper>
-      <div className="gradient-background flex h-screen flex-col lg:flex-row">
-        {/* header  */}
-        <aside
-          id="tessarus-sidebar-backdrop"
-          aria-label="backdrop"
-          className="pointer-events-none fixed z-[100] h-screen w-screen lg:hidden"
-          onClick={handleSideBarClose}
-        >
-          <Sidebar classname="translate-x-[-100%]" handleClose={handleSideBarClose} />
-        </aside>
+      <ProtectedLayout>
+        <div className="gradient-background flex h-screen flex-col lg:flex-row">
+          {/* header  */}
+          <aside
+            id="tessarus-sidebar-backdrop"
+            aria-label="backdrop"
+            className="pointer-events-none fixed z-[100] h-screen w-screen lg:hidden"
+            onClick={handleSideBarClose}
+          >
+            <Sidebar classname="translate-x-[-100%]" handleClose={handleSideBarClose} />
+          </aside>
 
-        <aside className="hidden lg:flex lg:flex-col">
-          <Sidebar hideClose />
-        </aside>
+          <aside className="hidden lg:flex lg:flex-col">
+            <Sidebar hideClose />
+          </aside>
 
-        <main className="flex flex-1 flex-col">
-          <header className="flex items-center justify-between border-default-300 px-4 py-5 text-default-600 md:px-6">
-            <div className="flex gap-4 lg:hidden">
-              <div className="flex cursor-pointer items-center justify-center transition-all hover:text-default-500">
-                <IoMenuOutline size={30} onClick={handleSideBarOpen} />
-              </div>
-              <div className="flex items-center gap-2">
-                <Image src={EspektroLogo} alt="Espektro Logo" width={30} height={30} className="rounded-full" />
-                <p className="text-xl xs:text-2xl">Tessarus</p>
-              </div>
-            </div>
-            <div className="lg:ml-auto">
-              {isLoggedIn && user ? (
-                <div className="flex items-center gap-6">
-                  <p className="text-md hidden text-default-600 xs:flex">Hello, {user.name}</p>
-                  <ProfileDropdown />
+          <main className="flex flex-1 flex-col">
+            <header className="flex items-center justify-between border-default-300 px-4 py-5 text-default-600 md:px-6">
+              <div className="flex gap-4 lg:hidden">
+                <div className="flex cursor-pointer items-center justify-center transition-all hover:text-default-500">
+                  <IoMenuOutline size={30} onClick={handleSideBarOpen} />
                 </div>
-              ) : (
-                <div className="flex items-center gap-4">
-                  <Button variant="light" className="hidden text-default-600 sm:flex" radius="sm">
-                    Sign up
-                  </Button>
-                  <Button color="primary" radius="sm">
-                    Login
-                  </Button>
+                <div className="flex items-center gap-2">
+                  <Image src={EspektroLogo} alt="Espektro Logo" width={30} height={30} className="rounded-full" />
+                  <p className="text-xl xs:text-2xl">Tessarus</p>
                 </div>
-              )}
-            </div>
-          </header>
-          <section className="flex-1 border-red-400 p-4">
-            <Outlet />
-          </section>
-          {/* footer */}
-        </main>
-      </div>
+              </div>
+              <div className="lg:ml-auto">
+                {isLoggedIn && user ? (
+                  <div className="flex items-center gap-6">
+                    <p className="text-md hidden text-default-600 xs:flex">Hello, {user.name}</p>
+                    <ProfileDropdown />
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-4">
+                    <Button variant="light" className="hidden text-default-600 sm:flex" radius="sm">
+                      Sign up
+                    </Button>
+                    <Button
+                      color="primary"
+                      radius="sm"
+                      onClick={() => {
+                        navigate(RoutePath.login());
+                      }}
+                    >
+                      Login
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </header>
+            <section className="flex-1 border-red-400 p-4">
+              <Outlet />
+            </section>
+            {/* footer */}
+          </main>
+        </div>
+      </ProtectedLayout>
     </RouteWrapper>
   );
 };
