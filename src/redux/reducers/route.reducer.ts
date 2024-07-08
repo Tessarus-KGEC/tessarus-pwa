@@ -1,11 +1,5 @@
 /* eslint-disable no-param-reassign */
-import {
-  AnalyticsTab,
-  CheckInTab,
-  EventTab,
-  PaymentLogsTab,
-  RouteQuery,
-} from '@/types/route';
+import { AnalyticsTab, CheckInTab, EventTab, PaymentLogsTab, RouteQuery } from '@/types/route';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { createSlice } from '@reduxjs/toolkit';
 
