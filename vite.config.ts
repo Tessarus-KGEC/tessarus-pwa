@@ -17,7 +17,7 @@ export default defineConfig({
       srcDir: 'src',
       filename: 'sw.ts',
       registerType: 'autoUpdate',
-      injectRegister: null,  // for null -> i have to manually register the service worker
+      injectRegister: null, // for null -> i have to manually register the service worker
 
       pwaAssets: {
         disabled: false,
@@ -32,9 +32,8 @@ export default defineConfig({
         lang: 'en-GB',
         name: 'Tesssarus',
         short_name: 'Tessarus',
-        start_url: '/',
-        description:
-          'Ticketing system with check-in support  for espektro kgec ',
+        start_url: '/dashboard/events',
+        description: 'Ticketing system with check-in support  for espektro kgec ',
         id: 'tesssarus-ticketing-espektro-kgec-pwa-#0ab23nm',
         icons: [
           {
