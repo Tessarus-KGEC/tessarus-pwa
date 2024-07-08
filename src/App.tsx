@@ -1,11 +1,9 @@
-import { useEffect, useState } from 'react'
-import './App.css'
-import reactLogo from './assets/react.svg'
-import appLogo from '/favicon.svg'
+import { NextUIProvider } from '@nextui-org/system';
+import { useEffect } from 'react';
+import { RouterProvider } from 'react-router-dom';
+import { appRouter } from './Route';
 
 function App() {
-  const [count, setCount] = useState(0)
-
   useEffect(() => {
     if ('serviceWorker' in navigator && 'PushManager' in window) {
       navigator.serviceWorker
@@ -28,32 +26,15 @@ function App() {
           console.error('Service Worker registration failed', error);
         });
     }
-  }, [])
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={appLogo} className="logo" alt="tessarus-pwa logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>tessarus-pwa</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <NextUIProvider>
+      <body className="h-screen bg-background text-foreground dark">
+        <RouterProvider router={appRouter} />
+      </body>
+    </NextUIProvider>
+  );
 }
 
-export default App
+export default App;

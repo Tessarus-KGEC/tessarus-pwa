@@ -1,0 +1,35 @@
+export enum Route {
+  LOGIN = 'login',
+  OTP = 'otp',
+  SIGNUP = 'sign-up',
+  EVENTS = 'events',
+  CHECKIN = 'check-in',
+  WALLET = 'wallet',
+  ANALYTICS = 'analytics',
+  USER_MANAGEMENT = 'user-management',
+  PAYMENT_LOGS = 'payment-logs',
+}
+
+export enum RouteQuery {
+  TAB = 'tab',
+}
+
+export enum EventTab {
+  ONGOING = 'ongoing',
+  UPCOMING = 'upcoming',
+}
+
+export enum CheckInTab {
+  SCANNER = 'scanner',
+  MANUAL = 'manual',
+}
+
+export enum PaymentLogsTab {
+  ALL = 'all',
+  FAILED = 'failed',
+}
+
+export enum AnalyticsTab {
+  EVENTS = 'events',
+  PAYMENT = 'payment',
+}
