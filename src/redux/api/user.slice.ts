@@ -1,5 +1,5 @@
 import { HttpMethod, Response } from '@/types/api.type';
-import { UserSelfResponse } from '@/types/response.type';
+import { PushSubscriptionPublicKeyResponse, UserSelfResponse } from '@/types/response.type';
 import { RootState } from '@/types/store.type';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
@@ -24,7 +24,13 @@ export const userApi = createApi({
         method: HttpMethod.GET,
       }),
     }),
+    getPushSubscriptionPublicKey: builder.query<Response<PushSubscriptionPublicKeyResponse>, void>({
+      query: () => ({
+        url: '/notification/key',
+        method: HttpMethod.GET,
+      }),
+    }),
   }),
 });
 
-export const { useCurrentUserQuery } = userApi;
+export const { useCurrentUserQuery, useGetPushSubscriptionPublicKeyQuery } = userApi;

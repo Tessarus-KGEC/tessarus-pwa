@@ -1,5 +1,3 @@
-'use client';
-
 import { PublicPath } from '@/constants/route';
 import { RouteQuery } from '@/types/route';
 import { FunctionComponent, PropsWithChildren, useEffect } from 'react';

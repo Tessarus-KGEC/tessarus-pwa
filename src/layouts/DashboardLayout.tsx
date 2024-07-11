@@ -122,7 +122,7 @@ const Sidebar: FunctionComponent<{
           {navlinks.map((link) => {
             if (link.status === 'inactive') return null;
             return (
-              <Link to={`/dashboard/${link.route}`}>
+              <Link key={link.route} to={`/dashboard/${link.route}`}>
                 <div
                   className={`flex items-center gap-2 rounded-xl px-4 py-2 ${isActiveRoute(link.route) ? 'bg-default-200 text-default-600' : 'text-default-500'} hover:bg-default-200 hover:text-default-600`}
                 >
