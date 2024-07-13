@@ -17,7 +17,7 @@ export default defineConfig({
       srcDir: 'src',
       filename: 'sw.ts',
       registerType: 'autoUpdate',
-      injectRegister: null, // for null -> i have to manually register the service worker
+      injectRegister: 'auto', // for null -> i have to manually register the service worker
 
       pwaAssets: {
         disabled: false,

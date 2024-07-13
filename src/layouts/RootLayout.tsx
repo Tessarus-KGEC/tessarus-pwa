@@ -12,15 +12,15 @@ const RootLayout: FunctionComponent = () => {
     skip: !isLoggedIn,
   });
 
-  const registerServiceWorker = useCallback(async () => {
-    try {
-      const registration = await navigator.serviceWorker.register('/sw.js');
-      console.log('Service worker successfully registered.');
-      return registration;
-    } catch (err) {
-      console.error('Unable to register service worker.', err);
-    }
-  }, []);
+  // const registerServiceWorker = useCallback(async () => {
+  //   try {
+  //     const registration = await navigator.serviceWorker.register('/sw.js');
+  //     console.log('Service worker successfully registered.', registration);
+  //     return registration;
+  //   } catch (err) {
+  //     console.error('Unable to register service worker.', err);
+  //   }
+  // }, []);
 
   const askNotificationPermission = useCallback(async () => {
     try {
@@ -90,18 +90,18 @@ const RootLayout: FunctionComponent = () => {
   }, [subscriptionPublicKeyResponse, isError, askNotificationPermission, subscribeUserToPush, authToken]);
 
   // first we register the service worker by ourselves
-  useEffect(() => {
-    if (!('serviceWorker' in navigator)) {
-      // Service Worker isn't supported on this browser, disable or hide UI.
-      return;
-    }
+  // useEffect(() => {
+  //   if (!('serviceWorker' in navigator)) {
+  //     // Service Worker isn't supported on this browser, disable or hide UI.
+  //     return;
+  //   }
 
-    if (!('PushManager' in window)) {
-      // Push isn't supported on this browser, disable or hide UI.
-      return;
-    }
-    registerServiceWorker();
-  }, [registerServiceWorker]);
+  //   if (!('PushManager' in window)) {
+  //     // Push isn't supported on this browser, disable or hide UI.
+  //     return;
+  //   }
+  //   registerServiceWorker();
+  // }, []);
 
   // now ask for permission to send notification through the service worker
   // and if granted then subscribe the user to push notifications
