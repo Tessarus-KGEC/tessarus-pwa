@@ -1,0 +1,18 @@
+export const ORGANISING_CLUB_MAP = {
+  ALL: 'All',
+  RIYAZ: 'Riyaz',
+  ELYSIUM: 'Elysium',
+  SHUTTERBUG: 'Shutterbug',
+  CHITRANK: 'Chitrank',
+  LITMUS: 'Litmus',
+  GDSC: 'Google Developer Student Club',
+  ROBOTICS_SOCIETY: 'Robotics Society',
+  SAC: 'Student Automobile Club',
+  LESQUIZARABLE: 'Lesquizarable',
+  INFINITIO: 'Infinitio',
+  KEYGENCODERS: 'KeygenCoders',
+  NOSCOPE: 'NoScope',
+  IMPOSTER: 'Imposter',
+  NOVA: 'Nova',
+  SPORTRIX: 'Sportrix',
+} as const;

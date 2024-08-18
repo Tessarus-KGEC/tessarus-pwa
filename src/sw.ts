@@ -1,10 +1,6 @@
 /// <reference lib="webworker" />
 import { clientsClaim } from 'workbox-core';
-import {
-  cleanupOutdatedCaches,
-  createHandlerBoundToURL,
-  precacheAndRoute,
-} from 'workbox-precaching';
+import { cleanupOutdatedCaches, createHandlerBoundToURL, precacheAndRoute } from 'workbox-precaching';
 import { NavigationRoute, registerRoute } from 'workbox-routing';
 
 declare let self: ServiceWorkerGlobalScope;
@@ -20,18 +16,25 @@ let allowlist: RegExp[] | undefined;
 if (import.meta.env.DEV) allowlist = [/^\/$/];
 
 // to allow work offline
-registerRoute(
-  new NavigationRoute(createHandlerBoundToURL('index.html'), { allowlist })
-);
+registerRoute(new NavigationRoute(createHandlerBoundToURL('index.html'), { allowlist }));
 
 self.skipWaiting();
 clientsClaim();
 
 main();
+
 async function main() {
-  console.log(
-    '******************** Server worker registered ********************'
-  );
+  console.log('******************** Server worker registered ********************');
+
+  self.addEventListener('push', (event) => {
+    console.log('push event', event);
+    const payload = event.data?.text() ?? 'no payload';
+    event.waitUntil(
+      self.registration.showNotification('Tessarus', {
+        body: JSON.parse(payload),
+      }),
+    );
+  });
 }
 
-main();
+// main();

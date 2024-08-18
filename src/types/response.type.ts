@@ -10,3 +10,7 @@ export interface VerifyOTPResponse {
 }
 
 export interface UserSelfResponse extends User {}
+
+export interface PushSubscriptionPublicKeyResponse {
+  publicKey: string;
+}

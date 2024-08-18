@@ -4,7 +4,7 @@ import DashboardLayout from './layouts/DashboardLayout';
 import RootLayout from './layouts/RootLayout';
 import Analytics from './pages/Analytics';
 import Checkin from './pages/CheckIn';
-import Events from './pages/Events';
+import Events from './pages/Events/Events';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
 import Otp from './pages/Otp';
