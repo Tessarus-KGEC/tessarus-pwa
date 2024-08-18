@@ -118,7 +118,7 @@ const RootLayout: FunctionComponent = () => {
 
   return (
     <>
-      <body className="h-screen bg-background text-foreground dark">
+      <body id="app-body" className="h-screen bg-background text-foreground dark">
         <Outlet />
       </body>
       <Toaster
