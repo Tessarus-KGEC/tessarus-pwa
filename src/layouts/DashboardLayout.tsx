@@ -1,6 +1,6 @@
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-import { FunctionComponent, useCallback } from 'react';
+import { FunctionComponent, useCallback, useEffect, useState } from 'react';
 import { IoAnalyticsOutline, IoCloseOutline, IoDocumentTextOutline, IoMenuOutline, IoScanOutline, IoWalletOutline } from 'react-icons/io5';
 import { MdOutlineAdminPanelSettings, MdOutlineEvent } from 'react-icons/md';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
@@ -16,6 +16,7 @@ import { Avatar } from '@nextui-org/avatar';
 import { Button } from '@nextui-org/button';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/dropdown';
 import { Image } from '@nextui-org/react';
+import { MdInstallMobile } from 'react-icons/md';
 
 gsap.registerPlugin(useGSAP);
 
@@ -98,7 +99,8 @@ const Sidebar: FunctionComponent<{
   classname?: string;
   hideClose?: boolean;
   handleClose?: () => void;
-}> = ({ handleClose, classname, hideClose }) => {
+  renderCustomPWAInstallPrompt?: Event | null;
+}> = ({ handleClose, classname, hideClose, renderCustomPWAInstallPrompt }) => {
   const { activeRoute } = useAppSelector((state) => state.route);
 
   const isActiveRoute = useCallback((title: string) => activeRoute.includes(title), [activeRoute]);
@@ -134,6 +136,20 @@ const Sidebar: FunctionComponent<{
           })}
         </ul>
       </div>
+      {renderCustomPWAInstallPrompt ? (
+        <Button
+          className="mx-4 mb-5 mt-auto bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg"
+          onClick={() => {
+            if ('prompt' in renderCustomPWAInstallPrompt) {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (renderCustomPWAInstallPrompt as any).prompt();
+            }
+          }}
+        >
+          <MdInstallMobile size={18} />
+          Install App
+        </Button>
+      ) : null}
     </nav>
   );
 };
@@ -141,6 +157,7 @@ const Sidebar: FunctionComponent<{
 const DashboardLayout: FunctionComponent = () => {
   const navigate = useNavigate();
   const { isLoggedIn, user } = useAppSelector((state) => state.auth);
+  const [renderCustomPWAInstallPrompt, setRenderCustomPWAInstallPrompt] = useState<Event | null>(null);
   const { contextSafe } = useGSAP();
   const handleSideBarOpen = contextSafe(() => {
     gsap
@@ -154,22 +171,33 @@ const DashboardLayout: FunctionComponent = () => {
       .to('#tessarus-sidebar', { x: '-100%', duration: 0.3, ease: 'power2.inOut' })
       .to('#tessarus-sidebar-backdrop', { pointerEvents: 'none', duration: 0.3 }, '<');
   });
+
+  useEffect(() => {
+    window.addEventListener('beforeinstallprompt', (e) => {
+      console.log(`'beforeinstallprompt' event was fired.`, e);
+      // Prevents the default mini-infobar or install dialog from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      setRenderCustomPWAInstallPrompt(e);
+    });
+  }, []);
+
   return (
     <RouteWrapper>
       <ProtectedLayout>
-        <div className="gradient-background flex h-screen flex-col lg:flex-row">
+        <div className="gradient-background flex h-[100dvh] flex-col lg:flex-row">
           {/* header  */}
           <aside
             id="tessarus-sidebar-backdrop"
             aria-label="backdrop"
-            className="pointer-events-none fixed z-[100] h-screen w-screen lg:hidden"
+            className="pointer-events-none fixed z-[100] h-[100dvh] w-screen lg:hidden"
             onClick={handleSideBarClose}
           >
-            <Sidebar classname="translate-x-[-100%]" handleClose={handleSideBarClose} />
+            <Sidebar classname="translate-x-[-100%]" handleClose={handleSideBarClose} renderCustomPWAInstallPrompt={renderCustomPWAInstallPrompt} />
           </aside>
 
           <aside className="hidden lg:flex lg:flex-col">
-            <Sidebar hideClose />
+            <Sidebar hideClose renderCustomPWAInstallPrompt={renderCustomPWAInstallPrompt} />
           </aside>
 
           <main className="flex flex-1 flex-col">

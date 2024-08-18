@@ -110,12 +110,6 @@ const RootLayout: FunctionComponent = () => {
     handleSubscription();
   }, [handleSubscription]);
 
-  useEffect(() => {
-    window.addEventListener('beforeinstallprompt', (e) => {
-      console.log(`'beforeinstallprompt' event was fired.`, e);
-    });
-  }, []);
-
   return (
     <>
       <body id="app-body" className="h-screen bg-background text-foreground dark">
