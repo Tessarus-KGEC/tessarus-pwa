@@ -3,6 +3,7 @@ import { FunctionComponent, useState } from 'react';
 import { IoFilter } from 'react-icons/io5';
 import SearchBar from '../../components/SearchBar';
 import Sheet from '../../components/Sheet';
+import FilterForm from './components/FilterForm';
 
 const Events: FunctionComponent = () => {
   const [isFilterOpened, setIsFilterOpened] = useState(false);
@@ -18,7 +19,7 @@ const Events: FunctionComponent = () => {
       </div>
 
       <Sheet open={isFilterOpened} onClose={() => setIsFilterOpened(false)}>
-        <h1>Filter</h1>
+        <FilterForm />
       </Sheet>
     </section>
   );
