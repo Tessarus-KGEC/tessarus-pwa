@@ -35,3 +35,36 @@ export const EVENT_TYPE_MAP = {
 
 export type EventType = (typeof EVENT_TYPE_MAP)[keyof typeof EVENT_TYPE_MAP];
 export const EventTypeArray = Object.values(EVENT_TYPE_MAP);
+
+export const PERMISSIONS = {
+  // handling user roles
+  ASSIGN_ROLE: 'assign:role',
+  REVOKE_ROLE: 'revoke:role',
+
+  // handling event permissions
+  CREATE_EVENT: 'create:event',
+  UPDATE_EVENT: 'update:event',
+  DELETE_EVENT: 'delete:event',
+  ASSIGN_EVENT: 'assign:event',
+  REVOKE_EVENT: 'revoke:event',
+  VIEW_EVENT: 'view:event',
+
+  // handling payment permissions
+  // can view all the payments logs
+  PAYMENT_LOGS: 'payment:logs',
+
+  // handling addition of coins in wallet
+  /**
+   * @description This permission is used to add coins to a user's wallet
+   */
+  ADD_COINS: 'add:coins',
+  /**
+   * @description This permission is used to revoke coins from a user's wallet
+   */
+  REVOKE_COINS: 'revoke:coins',
+
+  // assign volunteer to an event
+  ASSIGN_VOLUNTEER: 'assign:volunteer',
+  // revoke volunteer from an event
+  REVOKE_VOLUNTEER: 'revoke:volunteer',
+} as const;

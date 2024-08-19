@@ -1,9 +1,13 @@
 import { Button } from '@nextui-org/button';
 import { Card, CardBody, CardFooter, CardHeader, Chip, ScrollShadow } from '@nextui-org/react';
 import { FunctionComponent, useState } from 'react';
-import { IoCalendar, IoFilter, IoLocationSharp } from 'react-icons/io5';
+import { IoAdd, IoCalendar, IoFilter, IoLocationSharp } from 'react-icons/io5';
+import { useNavigate } from 'react-router-dom';
 import SearchBar from '../../components/SearchBar';
 import Sheet from '../../components/Sheet';
+import { PERMISSIONS } from '../../constants';
+import { RoutePath } from '../../constants/route';
+import useMediaQuery from '../../hooks/useMedia';
 import { useAppSelector } from '../../redux';
 import { useGetAllEventsQuery } from '../../redux/api/event.slice';
 import { formateDate } from '../../utils/formateDate';
@@ -13,15 +17,34 @@ const Events: FunctionComponent = () => {
   const { user } = useAppSelector((state) => state.auth);
   const [isFilterOpened, setIsFilterOpened] = useState(false);
   const { data: eventsResponse, isLoading, isError } = useGetAllEventsQuery();
+  const isMobile = useMediaQuery('(max-width: 768px)');
+  const navigate = useNavigate();
   return (
     <div className="flex h-full flex-1 flex-grow-0 flex-col gap-4">
       <div className="space-y-4 px-4">
         <h1 className="text-2xl">Ongoing Events</h1>
         <div className="flex gap-4">
           <SearchBar placeholder="Search your favorite event..." />
-          <Button isIconOnly color="primary" aria-label="Like" onClick={() => setIsFilterOpened(!isFilterOpened)}>
+          <Button isIconOnly color="default" aria-label="Like" onClick={() => setIsFilterOpened(!isFilterOpened)}>
             <IoFilter size={24} />
           </Button>
+          {!user || !user.isFromKGEC || !user.permissions.includes(PERMISSIONS.CREATE_EVENT) ? null : (
+            <Button
+              isIconOnly={isMobile}
+              color="primary"
+              className={`space-x-2 ${!isMobile ? '!px-6' : ''}`}
+              onClick={() =>
+                navigate(RoutePath['edit-event'](), {
+                  replace: false,
+                })
+              }
+            >
+              <span>
+                <IoAdd size={24} />
+              </span>
+              {!isMobile ? 'Add Event' : null}
+            </Button>
+          )}
         </div>
       </div>
       {isLoading && <p>Loading...</p>}
@@ -61,7 +84,7 @@ const Events: FunctionComponent = () => {
                       <div className="flex items-center space-x-3">
                         <IoCalendar size={22} className="text-default-500" />
                         <div>
-                          <div className="text-default-500">From Date</div>
+                          <div className="text-default-500">To Date</div>
                           <div className="font-semibold">{formateDate(event.endTime)}</div>
                         </div>
                       </div>

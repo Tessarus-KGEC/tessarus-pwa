@@ -3,6 +3,8 @@ export enum Route {
   OTP = 'otp',
   SIGNUP = 'sign-up',
   EVENTS = 'events',
+  EVENT = 'event',
+  EDIT_EVENT = 'edit-event',
   CHECKIN = 'check-in',
   WALLET = 'wallet',
   ANALYTICS = 'analytics',
