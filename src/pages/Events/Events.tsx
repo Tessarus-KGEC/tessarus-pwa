@@ -2,23 +2,24 @@ import { Button } from '@nextui-org/button';
 import { Card, CardBody, CardFooter, CardHeader, Chip, ScrollShadow } from '@nextui-org/react';
 import { FunctionComponent, useState } from 'react';
 import { IoAdd, IoCalendar, IoFilter, IoLocationSharp } from 'react-icons/io5';
-import { useNavigate } from 'react-router-dom';
 import SearchBar from '../../components/SearchBar';
 import Sheet from '../../components/Sheet';
 import { PERMISSIONS } from '../../constants';
-import { RoutePath } from '../../constants/route';
 import useMediaQuery from '../../hooks/useMedia';
 import { useAppSelector } from '../../redux';
 import { useGetAllEventsQuery } from '../../redux/api/event.slice';
 import { formateDate } from '../../utils/formateDate';
+import CreateEventForm from './components/CreateEventForm';
 import FilterForm from './components/FilterForm';
 
 const Events: FunctionComponent = () => {
   const { user } = useAppSelector((state) => state.auth);
   const [isFilterOpened, setIsFilterOpened] = useState(false);
+
+  const [isCreateEventFormOpen, setIsCreateEventFormOpen] = useState(false);
+
   const { data: eventsResponse, isLoading, isError } = useGetAllEventsQuery();
   const isMobile = useMediaQuery('(max-width: 768px)');
-  const navigate = useNavigate();
   return (
     <div className="flex h-full flex-1 flex-grow-0 flex-col gap-4">
       <div className="space-y-4 px-4">
@@ -33,11 +34,7 @@ const Events: FunctionComponent = () => {
               isIconOnly={isMobile}
               color="primary"
               className={`space-x-2 ${!isMobile ? '!px-6' : ''}`}
-              onClick={() =>
-                navigate(RoutePath['edit-event'](), {
-                  replace: false,
-                })
-              }
+              onClick={() => setIsCreateEventFormOpen(true)}
             >
               <span>
                 <IoAdd size={24} />
@@ -109,9 +106,19 @@ const Events: FunctionComponent = () => {
           </ul>
         </ScrollShadow>
       )}
+
+      {/* Fillter form */}
       <Sheet open={isFilterOpened} onClose={() => setIsFilterOpened(false)}>
         <FilterForm />
       </Sheet>
+
+      {/* Create event form */}
+      <CreateEventForm
+        open={isCreateEventFormOpen}
+        onClose={() => {
+          setIsCreateEventFormOpen(false);
+        }}
+      />
     </div>
   );
 };

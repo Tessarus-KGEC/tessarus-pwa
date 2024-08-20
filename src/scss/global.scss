@@ -8,3 +8,23 @@
   background: radial-gradient(circle 400px at 30% 120%, rgba(83, 77, 177, 0.2) 0%, rgba(255, 255, 255, 0) 100%),
     radial-gradient(circle 300px at 70% -10%, rgba(76, 63, 253, 0.2) 0%, rgba(255, 255, 255, 0) 100%);
 }
+
+.w-md-editor-toolbar {
+  background-color: #27272a !important;
+  padding: 12px 8px !important;
+  border-top-left-radius: 14px !important;
+  border-top-right-radius: 14px !important;
+  font-family: sans-serif !important;
+}
+
+.wmde-markdown {
+  background-color: #27272a !important;
+
+  & ol {
+    list-style-type: decimal !important;
+  }
+
+  & ul {
+    list-style-type: disc !important;
+  }
+}

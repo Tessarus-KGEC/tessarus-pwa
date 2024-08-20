@@ -5,7 +5,6 @@ export const RoutePath = {
   [Route.OTP]: (otpToken: string) => `/auth/${Route.OTP}/${otpToken}`,
   [Route.EVENTS]: () => `/dashboard/${Route.EVENTS}`,
   [Route.EVENT]: (eventId: string) => `/dashboard/${Route.EVENT}/${eventId}`,
-  [Route.EDIT_EVENT]: (eventId?: string) => `/dashboard/${Route.EDIT_EVENT}${eventId ? `/${eventId}` : ''}`,
 };
 
 export const PublicPath = [Route.LOGIN, Route.OTP, Route.SIGNUP, Route.EVENTS];
