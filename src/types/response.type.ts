@@ -13,6 +13,8 @@ export interface VerifyOTPResponse {
 
 export interface UserSelfResponse extends User {}
 
+export interface EventCoordinatorsResponse extends Pick<User, '_id' | 'name' | 'email' | 'isFromKGEC' | 'isVolunteer' | 'profileImageUrl'> {}
+
 export interface PushSubscriptionPublicKeyResponse {
   publicKey: string;
 }

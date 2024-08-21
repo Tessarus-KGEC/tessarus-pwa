@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Button,
   DateRangePicker,
   Input,
@@ -15,9 +16,12 @@ import {
 } from '@nextui-org/react';
 import { Select, SelectItem } from '@nextui-org/select';
 import MDEditor, { commands } from '@uiw/react-md-editor';
-import React from 'react';
+import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { IoClose } from 'react-icons/io5';
+import FileUploader from '../../../components/ImageUploader';
 import { ORGANISING_CLUB_MAP } from '../../../constants';
+import { useGetAllEventCoordinatorsQuery } from '../../../redux/api/user.slice';
 
 const eventTypes = [
   { label: 'Solo', value: 'solo' },
@@ -28,7 +32,13 @@ const CreateEventForm: React.FC<{
   open: boolean;
   onClose: () => void;
 }> = ({ open, onClose }) => {
-  const { register, handleSubmit, control } = useForm<{
+  const [eventCoverImage, setEventCoverImage] = useState<File | null>(null);
+
+  const { data: eventCoordinatorsResp } = useGetAllEventCoordinatorsQuery(undefined, {
+    skip: !open,
+  });
+
+  const { register, handleSubmit, control, formState, reset, watch } = useForm<{
     title: string;
     description: string;
     rules: string;
@@ -41,6 +51,10 @@ const CreateEventForm: React.FC<{
     eventPriceForOthers: number;
     otherPlatformUrl: string;
     eventOrganiserClub: string;
+    eventDateRange: [Date, Date];
+    eventStartTime: Date;
+    eventEndTime: Date;
+    eventCoordinators: string[];
   }>({
     defaultValues: {
       title: '',
@@ -50,17 +64,23 @@ const CreateEventForm: React.FC<{
       prize: '',
       tagLine: '',
       eventType: 'solo',
-      participants: [1, 5],
+      participants: [1, 2],
       eventPriceForKGEC: 0,
-      eventPriceForOthers: 0,
+      eventPriceForOthers: 10,
       otherPlatformUrl: '',
       eventOrganiserClub: '',
+      eventCoordinators: [],
     },
   });
+
+  const watchValues = watch();
   return (
     <Modal
       isOpen={open}
-      onClose={onClose}
+      onClose={() => {
+        reset();
+        onClose();
+      }}
       size="full"
       motionProps={{
         variants: {
@@ -91,7 +111,7 @@ const CreateEventForm: React.FC<{
         <ModalBody className="overflow-auto border-red-500">
           <form>
             <Input
-              {...register('title', { required: true })}
+              {...register('title', { required: 'Title is required for event' })}
               isRequired
               type="text"
               label="Event Title"
@@ -104,10 +124,12 @@ const CreateEventForm: React.FC<{
               classNames={{
                 mainWrapper: 'my-4',
               }}
+              isInvalid={!!formState.errors.title}
+              errorMessage={formState.errors.title?.message}
             />
 
             <Textarea
-              {...register('description', { required: true })}
+              {...register('description', { required: 'Description is required for event' })}
               isRequired
               label="Description"
               placeholder="Enter your description"
@@ -116,9 +138,12 @@ const CreateEventForm: React.FC<{
               required
               description="Enter valid description not more that 250 words"
               maxRows={15}
+              className="max-w-4xl"
               classNames={{
                 mainWrapper: 'my-4',
               }}
+              isInvalid={!!formState.errors.description}
+              errorMessage={formState.errors.description?.message}
             />
 
             <div className="mb-10 mt-4 space-y-2">
@@ -130,7 +155,7 @@ const CreateEventForm: React.FC<{
                 render={({ field }) => (
                   // applying styles from global css
                   <MDEditor
-                    className="!rounded-2xl !bg-default-100 !shadow-none dark"
+                    className="max-w-4xl !rounded-2xl !bg-default-100 !shadow-none dark"
                     value={field.value}
                     onChange={(e) => field.onChange(e)}
                     preview="edit"
@@ -150,7 +175,7 @@ const CreateEventForm: React.FC<{
             </div>
 
             <Input
-              {...register('venue', { required: true })}
+              {...register('venue', { required: 'Event venue is required' })}
               isRequired
               type="text"
               label="Event venue"
@@ -162,13 +187,68 @@ const CreateEventForm: React.FC<{
               classNames={{
                 mainWrapper: 'my-4 max-w-2xl',
               }}
+              isInvalid={!!formState.errors.venue}
+              errorMessage={formState.errors.venue?.message}
             />
 
             <div className="mb-10 mt-2 max-w-sm space-y-4">
-              <DateRangePicker labelPlacement="outside" label="Event Date" isRequired />
+              <Controller
+                key={'eventDateRange'}
+                name="eventDateRange"
+                control={control}
+                rules={{
+                  required: 'Event date range is required',
+                }}
+                render={({ field }) => (
+                  <DateRangePicker
+                    labelPlacement="outside"
+                    label="Event Date"
+                    isRequired
+                    onChange={(e) => {
+                      field.onChange([e.start.toDate('+0530'), e.end.toDate('+0530')]);
+                    }}
+                    isInvalid={!!formState.errors.eventDateRange}
+                    errorMessage={formState.errors.eventDateRange?.message}
+                  />
+                )}
+              />
               <div className="flex gap-2">
-                <TimeInput isRequired labelPlacement="outside" label="Start Time" />
-                <TimeInput isRequired labelPlacement="outside" label="End Time" />
+                <Controller
+                  key={'eventStartTime'}
+                  name="eventStartTime"
+                  control={control}
+                  rules={{
+                    required: 'Event start time is required',
+                  }}
+                  render={({ field }) => (
+                    <TimeInput
+                      isRequired
+                      labelPlacement="outside"
+                      label="Start Time"
+                      onChange={(e) => field.onChange(e)}
+                      isInvalid={!!formState.errors.eventStartTime}
+                      errorMessage={formState.errors.eventStartTime?.message}
+                    />
+                  )}
+                />
+                <Controller
+                  key={'eventEndTime'}
+                  name="eventEndTime"
+                  control={control}
+                  rules={{
+                    required: 'Event end time is required',
+                  }}
+                  render={({ field }) => (
+                    <TimeInput
+                      isRequired
+                      labelPlacement="outside"
+                      label="End Time"
+                      onChange={(e) => field.onChange(e)}
+                      isInvalid={!!formState.errors.eventEndTime}
+                      errorMessage={formState.errors.eventEndTime?.message}
+                    />
+                  )}
+                />
               </div>
             </div>
 
@@ -211,7 +291,7 @@ const CreateEventForm: React.FC<{
               ))}
             </RadioGroup>
 
-            <div className="mb-4 mt-6 space-y-1">
+            <div className="mb-4 mt-6 max-w-2xl space-y-1">
               <Controller
                 key={'participants'}
                 name="participants"
@@ -221,11 +301,11 @@ const CreateEventForm: React.FC<{
                     size="md"
                     step={1}
                     color="foreground"
-                    label="No of participants allowed"
+                    label={`Participants: ${watchValues.participants[0]} (min) to ${watchValues.participants[1]} (max)`}
                     showSteps={true}
                     maxValue={6}
                     minValue={1}
-                    defaultValue={[2, 5]}
+                    defaultValue={[1, 2]}
                     classNames={{
                       label: 'text-default-500 text-medium',
                     }}
@@ -233,64 +313,71 @@ const CreateEventForm: React.FC<{
                   />
                 )}
               />
-
-              <p className="text-sm text-default-500">Selected participants: 2 (min) to 5 (max)</p>
             </div>
 
             <Controller
               key={'eventOrganiserClub'}
               name="eventOrganiserClub"
               control={control}
+              rules={{
+                required: 'Organising club is required',
+              }}
               render={({ field }) => (
-                <Select
-                  isRequired
-                  labelPlacement="outside"
-                  size="lg"
-                  placeholder="Select organising club"
-                  classNames={{
-                    mainWrapper: 'my-4 max-w-2xl',
-                    popoverContent: 'text-foreground dark',
-                  }}
-                  onChange={(e) => {
-                    field.onChange(e.target.value);
-                  }}
-                >
-                  {Object.entries(ORGANISING_CLUB_MAP)
-                    .filter(([key]) => key !== 'ALL')
-                    .map(([key, value]) => {
-                      return <SelectItem key={key}>{value}</SelectItem>;
-                    })}
-                </Select>
+                <div className="mb-10 mt-6 max-w-2xl space-y-2">
+                  <p>
+                    Select organising club <span className="text-red-500">*</span>
+                  </p>
+                  <Select
+                    isRequired
+                    labelPlacement="outside"
+                    size="lg"
+                    placeholder="Select organising club"
+                    classNames={{
+                      popoverContent: 'text-foreground dark',
+                    }}
+                    onChange={(e) => {
+                      field.onChange(e.target.value);
+                    }}
+                    isInvalid={!!formState.errors.eventOrganiserClub}
+                    errorMessage={formState.errors.eventOrganiserClub?.message}
+                  >
+                    {Object.entries(ORGANISING_CLUB_MAP)
+                      .filter(([key]) => key !== 'ALL')
+                      .map(([key, value]) => {
+                        return <SelectItem key={key}>{value}</SelectItem>;
+                      })}
+                  </Select>
+                </div>
               )}
             />
 
             <Input
-              {...register('eventPriceForKGEC')}
+              {...register('eventPriceForKGEC', { valueAsNumber: true })}
               type="number"
-              label="Price for KGEC students"
+              label="Price for KGEC students ( ₹ )"
               labelPlacement="outside"
               placeholder="Enter event price (KGEC)"
               required
               size="lg"
-              defaultValue={'0'}
               classNames={{
                 mainWrapper: 'my-4 max-w-xs',
               }}
             />
 
             <Input
-              {...register('eventPriceForOthers', { required: true })}
+              {...register('eventPriceForOthers', { required: 'Event price for non KGECians is required', valueAsNumber: true })}
               isRequired
               type="number"
-              label="Price for other students"
+              label="Price for other students ( ₹ )"
               labelPlacement="outside"
               placeholder="Enter event price (non-KGEC)"
               required
               size="lg"
-              defaultValue={'0'}
               classNames={{
                 mainWrapper: 'my-4 max-w-xs',
               }}
+              isInvalid={!!formState.errors.eventPriceForOthers}
+              errorMessage={formState.errors.eventPriceForOthers?.message}
             />
             <Input
               {...register('otherPlatformUrl')}
@@ -305,6 +392,80 @@ const CreateEventForm: React.FC<{
                 mainWrapper: 'my-4 max-w-2xl',
               }}
             />
+
+            {eventCoordinatorsResp?.status === 200 ? (
+              <Controller
+                key={'eventCoordinators'}
+                name="eventCoordinators"
+                control={control}
+                render={({ field }) => (
+                  <div className="mb-8 mt-2 max-w-2xl space-y-2">
+                    <p>Select event coordinators</p>
+                    <Select
+                      isRequired
+                      labelPlacement="outside"
+                      size="lg"
+                      selectionMode="multiple"
+                      placeholder="Select event coordinators"
+                      classNames={{
+                        popoverContent: 'text-foreground dark',
+                      }}
+                      onSelectionChange={(val) => {
+                        field.onChange(Array.from(val));
+                      }}
+                      isInvalid={!!formState.errors.eventOrganiserClub}
+                      errorMessage={formState.errors.eventOrganiserClub?.message}
+                    >
+                      {eventCoordinatorsResp.data.length > 0 ? (
+                        eventCoordinatorsResp.data.map((user) => {
+                          return (
+                            <SelectItem key={user._id} textValue={user.name}>
+                              <div className="flex items-center gap-2">
+                                <Avatar alt={user.name} className="flex-shrink-0" size="sm" src={user.profileImageUrl} />
+                                <div className="flex flex-col">
+                                  <span className="text-small">{user.name}</span>
+                                  <span className="text-tiny text-default-400">{user.email}</span>
+                                </div>
+                              </div>
+                            </SelectItem>
+                          );
+                        })
+                      ) : (
+                        <SelectItem key={'not-found'}>No coordinators found</SelectItem>
+                      )}
+                    </Select>
+                  </div>
+                )}
+              />
+            ) : null}
+
+            <div className="my-4 space-y-2">
+              <p>Event Cover Image</p>
+              {eventCoverImage ? (
+                <div className="group relative w-fit">
+                  <div
+                    className="absolute right-4 top-4 z-10 w-fit"
+                    onClick={() => {
+                      setEventCoverImage(null);
+                    }}
+                  >
+                    <IoClose size={25} className="cursor-pointer" />
+                  </div>
+                  <img
+                    src={URL.createObjectURL(eventCoverImage)}
+                    alt="event cover image"
+                    className="max-w-2xl transition-all group-hover:opacity-60"
+                  />
+                </div>
+              ) : (
+                <FileUploader
+                  acceptedFileTypes={['Image']}
+                  onFileDrop={(files) => {
+                    setEventCoverImage(files[0]);
+                  }}
+                />
+              )}
+            </div>
           </form>
         </ModalBody>
         <ModalFooter>

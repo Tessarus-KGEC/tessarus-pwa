@@ -1,5 +1,5 @@
 import { HttpMethod, Response } from '@/types/api.type';
-import { PushSubscriptionPublicKeyResponse, UserSelfResponse } from '@/types/response.type';
+import { EventCoordinatorsResponse, PushSubscriptionPublicKeyResponse, UserSelfResponse } from '@/types/response.type';
 import { RootState } from '@/types/store.type';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
@@ -30,7 +30,13 @@ export const userApi = createApi({
         method: HttpMethod.GET,
       }),
     }),
+    getAllEventCoordinators: builder.query<Response<EventCoordinatorsResponse[]>, void>({
+      query: () => ({
+        url: '/coordinators',
+        method: HttpMethod.GET,
+      }),
+    }),
   }),
 });
 
-export const { useCurrentUserQuery, useGetPushSubscriptionPublicKeyQuery } = userApi;
+export const { useCurrentUserQuery, useGetPushSubscriptionPublicKeyQuery, useGetAllEventCoordinatorsQuery } = userApi;
