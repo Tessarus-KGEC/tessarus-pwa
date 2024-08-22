@@ -15,11 +15,9 @@ type AcceptedFileKeys = keyof typeof AcceptedFileTypes;
 type AcceptedFileTypes = (typeof AcceptedFileTypes)[keyof typeof AcceptedFileTypes];
 
 const FileUploader: React.FC<FileUploaderProps> = ({ onFileDrop, acceptedFileTypes }) => {
-  const [dropZoneActive, setDropZoneActive] = useState(false);
+  const [, setDropZoneActive] = useState(false);
   function onDragOver(event: React.DragEvent<HTMLDivElement>) {
     event.preventDefault();
-    const dropItems = Array.from(event.dataTransfer.items);
-    const dropFiles = Array.from(event.dataTransfer.files);
     setDropZoneActive(true);
     // if (dropItems) {
     // } else {
