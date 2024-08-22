@@ -200,7 +200,7 @@ const DashboardLayout: FunctionComponent = () => {
             <Sidebar hideClose renderCustomPWAInstallPrompt={renderCustomPWAInstallPrompt} />
           </aside>
 
-          <main className="flex flex-1 flex-col">
+          <main className="flex max-h-full flex-1 flex-col overflow-y-hidden">
             <header className="flex items-center justify-between border-default-300 px-4 py-5 text-default-600 md:px-6">
               <div className="flex gap-4 lg:hidden">
                 <div className="flex cursor-pointer items-center justify-center transition-all hover:text-default-500">
@@ -235,7 +235,7 @@ const DashboardLayout: FunctionComponent = () => {
                 )}
               </div>
             </header>
-            <section className="flex-1 border-red-400 p-4">
+            <section className="flex-1 overflow-auto">
               <Outlet />
             </section>
             {/* footer */}
