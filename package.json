@@ -30,6 +30,7 @@
     "@nextui-org/theme": "^2.2.6",
     "@reduxjs/toolkit": "^2.2.6",
     "@uiw/react-md-editor": "^4.0.4",
+    "axios": "^1.7.4",
     "framer-motion": "^11.2.13",
     "gsap": "^3.12.5",
     "react": "^18.3.1",

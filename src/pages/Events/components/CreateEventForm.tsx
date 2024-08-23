@@ -16,52 +16,70 @@ import {
 } from '@nextui-org/react';
 import { Select, SelectItem } from '@nextui-org/select';
 import MDEditor, { commands } from '@uiw/react-md-editor';
+import axios from 'axios';
 import React, { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 import { IoClose } from 'react-icons/io5';
 import FileUploader from '../../../components/ImageUploader';
 import { ORGANISING_CLUB_MAP } from '../../../constants';
+import { useAppSelector } from '../../../redux';
+import { useCreateEventMutation } from '../../../redux/api/event.slice';
 import { useGetAllEventCoordinatorsQuery } from '../../../redux/api/user.slice';
+import { getAPIErrorMessage } from '../../../utils/api.helper';
 
 const eventTypes = [
   { label: 'Solo', value: 'solo' },
   { label: 'Group', value: 'group' },
 ];
 
+interface CreateEventFormProps {
+  title: string;
+  description: string;
+  rules: string;
+  eventVenue: string;
+  tagLine: string;
+  prizes: string;
+  eventType: string;
+  participants: number[];
+  eventPriceForKGEC: number;
+  eventPriceForOthers: number;
+  otherPlatformUrl: string;
+  eventOrganiserClub: string;
+  eventDateRange: [Date, Date];
+  eventStartTime: {
+    hours: number;
+    minutes: number;
+  };
+  eventEndTime: {
+    hours: number;
+    minutes: number;
+  };
+  eventCoordinators: string[];
+}
+
 const CreateEventForm: React.FC<{
   open: boolean;
   onClose: () => void;
 }> = ({ open, onClose }) => {
+  const { authToken } = useAppSelector((state) => state.auth);
   const [eventCoverImage, setEventCoverImage] = useState<File | null>(null);
 
   const { data: eventCoordinatorsResp } = useGetAllEventCoordinatorsQuery(undefined, {
     skip: !open,
   });
 
-  const { register, handleSubmit, control, formState, reset, watch } = useForm<{
-    title: string;
-    description: string;
-    rules: string;
-    venue: string;
-    tagLine: string;
-    prize: string;
-    eventType: string;
-    participants: number[];
-    eventPriceForKGEC: number;
-    eventPriceForOthers: number;
-    otherPlatformUrl: string;
-    eventOrganiserClub: string;
-    eventDateRange: [Date, Date];
-    eventStartTime: Date;
-    eventEndTime: Date;
-    eventCoordinators: string[];
-  }>({
+  const [isImageUploading, setIsImageUploading] = useState(false);
+
+  const [createEvent, { isLoading }] = useCreateEventMutation();
+
+  const { register, handleSubmit, control, formState, reset, watch } = useForm<CreateEventFormProps>({
     defaultValues: {
       title: '',
       description: '',
       rules: '**No rules**',
-      venue: '',
-      prize: '',
+      eventVenue: '',
+      prizes: '',
       tagLine: '',
       eventType: 'solo',
       participants: [1, 2],
@@ -72,6 +90,60 @@ const CreateEventForm: React.FC<{
       eventCoordinators: [],
     },
   });
+
+  async function handleFileUpload(eventId: string, file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/events/upload-cover-image/${eventId}`, formData, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      if (response.status === 200) {
+        toast.success('Image uploaded successfully');
+        setIsImageUploading(false);
+      }
+    } catch (error) {
+      toast.error('Error uploading image, no worries event created successfully');
+    }
+  }
+
+  async function handleCreateEvent(data: CreateEventFormProps) {
+    try {
+      const response = await createEvent({
+        title: data.title,
+        description: data.description,
+        rules: data.rules,
+        eventVenue: data.eventVenue,
+        prizes: data.prizes,
+        tagLine: data.tagLine,
+        eventType: data.eventType,
+        otherPlatformUrl: data.otherPlatformUrl,
+        eventCoordinators: data.eventCoordinators,
+        eventOrganiserClub: data.eventOrganiserClub,
+        eventPriceForKGEC: data.eventPriceForKGEC,
+        eventPrice: data.eventPriceForOthers,
+        minTeamMembersSize: data.participants[0],
+        maxTeamMembersSize: data.eventType === 'group' ? data.participants[1] : data.participants[0],
+        startTime: new Date(data.eventDateRange[0].setHours(data.eventStartTime.hours, data.eventStartTime.minutes)).toISOString(),
+        endTime: new Date(data.eventDateRange[1].setHours(data.eventEndTime.hours, data.eventEndTime.minutes)).toISOString(),
+      }).unwrap();
+      if (response.status === 201) {
+        toast.success(response.message);
+        if (eventCoverImage) {
+          setIsImageUploading(true);
+          toast.success('Started image uploading, please wait');
+          await handleFileUpload(response.data._id, eventCoverImage);
+        }
+      } else {
+        toast.error(response.message);
+      }
+    } catch (error) {
+      toast.error(getAPIErrorMessage(error));
+    }
+  }
 
   const watchValues = watch();
   return (
@@ -175,7 +247,7 @@ const CreateEventForm: React.FC<{
             </div>
 
             <Input
-              {...register('venue', { required: 'Event venue is required' })}
+              {...register('eventVenue', { required: 'Event venue is required' })}
               isRequired
               type="text"
               label="Event venue"
@@ -187,8 +259,8 @@ const CreateEventForm: React.FC<{
               classNames={{
                 mainWrapper: 'my-4 max-w-2xl',
               }}
-              isInvalid={!!formState.errors.venue}
-              errorMessage={formState.errors.venue?.message}
+              isInvalid={!!formState.errors.eventVenue}
+              errorMessage={formState.errors.eventVenue?.message}
             />
 
             <div className="mb-10 mt-2 max-w-sm space-y-4">
@@ -225,7 +297,16 @@ const CreateEventForm: React.FC<{
                       isRequired
                       labelPlacement="outside"
                       label="Start Time"
-                      onChange={(e) => field.onChange(e)}
+                      onChange={(e) => {
+                        if (!watchValues.eventDateRange) {
+                          toast.error('Please select event date range first');
+                          return;
+                        }
+                        field.onChange({
+                          hours: e.hour,
+                          minutes: e.minute,
+                        });
+                      }}
                       isInvalid={!!formState.errors.eventStartTime}
                       errorMessage={formState.errors.eventStartTime?.message}
                     />
@@ -243,7 +324,16 @@ const CreateEventForm: React.FC<{
                       isRequired
                       labelPlacement="outside"
                       label="End Time"
-                      onChange={(e) => field.onChange(e)}
+                      onChange={(e) => {
+                        if (!watchValues.eventDateRange) {
+                          toast.error('Please select event date range first');
+                          return;
+                        }
+                        field.onChange({
+                          hours: e.hour,
+                          minutes: e.minute,
+                        });
+                      }}
                       isInvalid={!!formState.errors.eventEndTime}
                       errorMessage={formState.errors.eventEndTime?.message}
                     />
@@ -265,7 +355,7 @@ const CreateEventForm: React.FC<{
             />
 
             <Input
-              {...register('prize')}
+              {...register('prizes')}
               type="text"
               label="Event prizes"
               labelPlacement="outside"
@@ -291,29 +381,31 @@ const CreateEventForm: React.FC<{
               ))}
             </RadioGroup>
 
-            <div className="mb-4 mt-6 max-w-2xl space-y-1">
-              <Controller
-                key={'participants'}
-                name="participants"
-                control={control}
-                render={({ field }) => (
-                  <Slider
-                    size="md"
-                    step={1}
-                    color="foreground"
-                    label={`Participants: ${watchValues.participants[0]} (min) to ${watchValues.participants[1]} (max)`}
-                    showSteps={true}
-                    maxValue={6}
-                    minValue={1}
-                    defaultValue={[1, 2]}
-                    classNames={{
-                      label: 'text-default-500 text-medium',
-                    }}
-                    onChange={(e) => field.onChange(e)}
-                  />
-                )}
-              />
-            </div>
+            {watchValues.eventType === 'group' ? (
+              <div className="mb-4 mt-6 max-w-2xl space-y-1">
+                <Controller
+                  key={'participants'}
+                  name="participants"
+                  control={control}
+                  render={({ field }) => (
+                    <Slider
+                      size="md"
+                      step={1}
+                      color="foreground"
+                      label={`Participants: ${watchValues.participants[0]} (min) to ${watchValues.participants[1]} (max)`}
+                      showSteps={true}
+                      maxValue={6}
+                      minValue={1}
+                      defaultValue={[1, 2]}
+                      classNames={{
+                        label: 'text-default-500 text-medium',
+                      }}
+                      onChange={(e) => field.onChange(e)}
+                    />
+                  )}
+                />
+              </div>
+            ) : null}
 
             <Controller
               key={'eventOrganiserClub'}
@@ -473,9 +565,11 @@ const CreateEventForm: React.FC<{
             Close
           </Button>
           <Button
+            isLoading={isLoading || isImageUploading}
             color="primary"
-            onClick={handleSubmit((data) => {
+            onClick={handleSubmit(async (data) => {
               console.log(data);
+              await handleCreateEvent(data);
             })}
           >
             Create Event

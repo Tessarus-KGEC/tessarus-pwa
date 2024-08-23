@@ -53,7 +53,7 @@ const Events: FunctionComponent = () => {
               <li key={event._id} className="">
                 <Card className="h-full">
                   <CardHeader>
-                    <img className="aspect-video w-full rounded-lg" alt={event.title} src={event.eventThumbnailImage} />
+                    <img className="aspect-video w-full rounded-lg object-cover" alt={event.title} src={event.eventThumbnailImage} />
                   </CardHeader>
                   <CardBody className="space-y-2">
                     <div className="flex gap-x-2">

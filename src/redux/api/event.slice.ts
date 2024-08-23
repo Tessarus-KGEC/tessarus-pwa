@@ -1,5 +1,5 @@
 import { HttpMethod, Response } from '@/types/api.type';
-import { GetAllEventsResponse } from '@/types/response.type';
+import { CreateEventResponse, GetAllEventsResponse } from '@/types/response.type';
 import { RootState } from '@/types/store.type';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { CreateEventArgs } from '../../types/args.type';
@@ -25,7 +25,7 @@ export const eventApi = createApi({
         method: HttpMethod.GET,
       }),
     }),
-    createEvent: builder.mutation<Response<unknown>, CreateEventArgs>({
+    createEvent: builder.mutation<Response<CreateEventResponse>, CreateEventArgs>({
       query: (args) => ({
         url: '/',
         method: HttpMethod.POST,
@@ -35,4 +35,4 @@ export const eventApi = createApi({
   }),
 });
 
-export const { useGetAllEventsQuery } = eventApi;
+export const { useGetAllEventsQuery, useCreateEventMutation } = eventApi;
