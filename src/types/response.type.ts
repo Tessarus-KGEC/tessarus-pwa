@@ -36,3 +36,8 @@ export interface GetAllEventsResponse {
   }[];
   totalCount: number;
 }
+
+export interface CreateEventResponse {
+  _id: string;
+  title: string;
+}
