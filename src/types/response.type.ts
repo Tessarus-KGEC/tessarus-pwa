@@ -1,4 +1,3 @@
-import { EventType } from 'react-hook-form';
 import { EventStatus, OrganisingClub } from '../constants';
 import { User } from './app.type';
 
@@ -20,24 +19,66 @@ export interface PushSubscriptionPublicKeyResponse {
 }
 
 export interface GetAllEventsResponse {
-  events: {
-    _id: string;
-    title: string;
-    description: string;
-    status: EventStatus;
-    eventPrice: number;
-    eventPriceForKGEC: number;
-    startTime: string;
-    endTime: string;
-    eventVenue: string;
-    eventThumbnailImage: string;
-    eventType: EventType;
-    eventOrganiserClub: OrganisingClub;
-  }[];
+  events: Pick<
+    EventResponse,
+    | '_id'
+    | 'title'
+    | 'description'
+    | 'status'
+    | 'eventPrice'
+    | 'eventPriceForKGEC'
+    | 'startTime'
+    | 'endTime'
+    | 'eventVenue'
+    | 'eventThumbnailImage'
+    | 'eventType'
+    | 'eventOrganiserClub'
+  >[];
   totalCount: number;
 }
 
 export interface CreateEventResponse {
   _id: string;
   title: string;
+}
+
+export interface EventResponse {
+  _id: string;
+  title: string;
+  description: string;
+  status?: EventStatus;
+  rules?: string;
+  prizes?: string;
+  tagLine?: string;
+  startTime: string;
+  endTime: string;
+  eventVenue: string;
+  eventThumbnailImage?: string;
+  eventCoverImage?: string;
+  pastEventImages?: [string];
+  otherPlatformUrl?: string;
+  eventType: 'group' | 'solo';
+  minTeamMembersSize?: number;
+  maxTeamMembersSize?: number;
+  eventPrice: number;
+  eventPriceForKGEC?: number;
+  isEventCancelled?: boolean;
+  eventOrganiserClub: OrganisingClub;
+  createdBy: {
+    name: string;
+    phone: string;
+    email: string;
+    profileImageUrl: string;
+  };
+  eventCoordinators: {
+    name: string;
+    phone: string;
+    email: string;
+    profileImageUrl: string;
+  }[];
+  sponsors?: {
+    name: string;
+    type?: string;
+    image?: string;
+  }[];
 }

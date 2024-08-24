@@ -4,6 +4,7 @@ import DashboardLayout from './layouts/DashboardLayout';
 import RootLayout from './layouts/RootLayout';
 import Analytics from './pages/Analytics';
 import Checkin from './pages/CheckIn';
+import Event from './pages/Event/Event';
 import Events from './pages/Events/Events';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
@@ -49,6 +50,10 @@ const appRouter = createBrowserRouter([
           {
             path: Route.EVENTS,
             element: <Events />,
+          },
+          {
+            path: `${Route.EVENTS}/:eventId`,
+            element: <Event />,
           },
           {
             path: Route.CHECKIN,
