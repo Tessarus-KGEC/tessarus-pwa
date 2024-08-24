@@ -1,5 +1,5 @@
 import { HttpMethod, Response } from '@/types/api.type';
-import { CreateEventResponse, GetAllEventsResponse } from '@/types/response.type';
+import { CreateEventResponse, EventResponse, GetAllEventsResponse } from '@/types/response.type';
 import { RootState } from '@/types/store.type';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { CreateEventArgs } from '../../types/args.type';
@@ -32,7 +32,25 @@ export const eventApi = createApi({
         body: args,
       }),
     }),
+    getEvent: builder.query<
+      Response<EventResponse>,
+      {
+        eventId: string;
+      }
+    >({
+      query: ({ eventId }) => ({
+        url: `/${eventId}`,
+        method: HttpMethod.GET,
+      }),
+    }),
+    getEventsRecommendation: builder.query<Response<GetAllEventsResponse>, void>({
+      query: () => ({
+        url: '/recommendations',
+        method: HttpMethod.GET,
+      }),
+      keepUnusedDataFor: 3600 * 4, // 4 hours
+    }),
   }),
 });
 
-export const { useGetAllEventsQuery, useCreateEventMutation } = eventApi;
+export const { useGetAllEventsQuery, useCreateEventMutation, useGetEventQuery, useGetEventsRecommendationQuery } = eventApi;
