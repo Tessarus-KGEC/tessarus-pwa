@@ -68,5 +68,3 @@ export const PERMISSIONS = {
   // revoke volunteer from an event
   REVOKE_VOLUNTEER: 'revoke:volunteer',
 } as const;
-
-export const FallbacKImage = 'https://via.placeholder.com/300x200';

@@ -1,15 +1,15 @@
 import { Button } from '@nextui-org/button';
-import { ScrollShadow } from '@nextui-org/react';
+import { Card, CardBody, CardFooter, CardHeader, Chip, ScrollShadow } from '@nextui-org/react';
 import { FunctionComponent, useState } from 'react';
-import { IoAdd, IoFilter } from 'react-icons/io5';
+import { IoAdd, IoCalendar, IoFilter, IoLocationSharp } from 'react-icons/io5';
 import SearchBar from '../../components/SearchBar';
 import Sheet from '../../components/Sheet';
 import { PERMISSIONS } from '../../constants';
 import useMediaQuery from '../../hooks/useMedia';
 import { useAppSelector } from '../../redux';
 import { useGetAllEventsQuery } from '../../redux/api/event.slice';
+import { formateDate } from '../../utils/formateDate';
 import CreateEventForm from './components/CreateEventForm';
-import EventCard from './components/EventCard';
 import FilterForm from './components/FilterForm';
 
 const Events: FunctionComponent = () => {
@@ -51,7 +51,55 @@ const Events: FunctionComponent = () => {
           <ul className="grid flex-1 grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4 overflow-y-auto !px-4 !pb-4">
             {eventsResponse.data.events.map((event) => (
               <li key={event._id} className="">
-                <EventCard event={event} isFromKGEC={user?.isFromKGEC} />
+                <Card className="h-full">
+                  <CardHeader>
+                    <img className="aspect-video w-full rounded-lg object-cover" alt={event.title} src={event.eventThumbnailImage} />
+                  </CardHeader>
+                  <CardBody className="space-y-2">
+                    <div className="flex gap-x-2">
+                      <h2 className="text-lg font-semibold">{event.title}</h2>
+                      <Chip color="default" variant="solid" className="ml-auto">
+                        {event.eventPrice === 0 || event.eventPriceForKGEC === 0
+                          ? 'Free'
+                          : user && user.isFromKGEC
+                            ? `₹ ${event.eventPriceForKGEC}`
+                            : `₹ ${event.eventPrice}`}
+                      </Chip>
+                    </div>
+                    <p className="text-sm text-default-500">
+                      {event.description.length > 100 ? `${event.description.slice(0, 80)}...` : event.description}
+                    </p>
+                    <p className="text-sm text-default-foreground">
+                      <div className="flex items-center space-x-3">
+                        <IoCalendar size={22} className="text-default-500" />
+                        <div>
+                          <div className="text-default-500">From Date</div>
+                          <div className="font-semibold">{formateDate(event.startTime)}</div>
+                        </div>
+                      </div>
+                      <span className="pl-2 text-lg leading-3 text-default-500">|</span>
+                      <div className="flex items-center space-x-3">
+                        <IoCalendar size={22} className="text-default-500" />
+                        <div>
+                          <div className="text-default-500">To Date</div>
+                          <div className="font-semibold">{formateDate(event.endTime)}</div>
+                        </div>
+                      </div>
+                    </p>
+                    <p className="flex items-center gap-2 text-primary-500">
+                      <IoLocationSharp />
+                      <span>{event.eventVenue}</span>
+                    </p>
+                  </CardBody>
+                  <CardFooter className="space-x-3">
+                    <Button color="default" className="w-full">
+                      View more
+                    </Button>
+                    <Button color="primary" className="w-full">
+                      Register
+                    </Button>
+                  </CardFooter>
+                </Card>
               </li>
             ))}
             <li className="py-3 text-center text-default-500">No more events found</li>

@@ -28,34 +28,3 @@
     list-style-type: disc !important;
   }
 }
-
-.wmde-markdown-color {
-  background: transparent !important;
-}
-
-.nextui-img {
-  background-color: red;
-}
-
-html {
-  /* width */
-  ::-webkit-scrollbar {
-    width: 8px;
-  }
-
-  /* Track */
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  /* Handle */
-  ::-webkit-scrollbar-thumb {
-    background: #474747;
-    border-radius: 30px;
-  }
-
-  /* Handle on hover */
-  ::-webkit-scrollbar-thumb:hover {
-    background: #555;
-  }
-}
