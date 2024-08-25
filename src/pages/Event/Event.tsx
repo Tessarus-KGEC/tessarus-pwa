@@ -21,7 +21,6 @@ const Event: React.FC = () => {
   const { data: eventData, isLoading } = useGetEventQuery({ eventId: eventId ?? '' });
   const { data: eventRecommendationData, isLoading: eventRecommendationLoading } = useGetEventsRecommendationQuery();
   const [initiatedRegistration, setInitiatedRegistration] = useState(false);
-
   if (isLoading) {
     return <div>Loading...</div>;
   }

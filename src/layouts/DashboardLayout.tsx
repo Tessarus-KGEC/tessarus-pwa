@@ -3,7 +3,7 @@ import gsap from 'gsap';
 import { FunctionComponent, useCallback, useEffect, useState } from 'react';
 import { IoAnalyticsOutline, IoCloseOutline, IoDocumentTextOutline, IoMenuOutline, IoScanOutline, IoWalletOutline } from 'react-icons/io5';
 import { MdOutlineAdminPanelSettings, MdOutlineEvent } from 'react-icons/md';
-import { Link, Outlet, useNavigate } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 import EspektroLogo from '@/assets/logo/Espektro logo fill.svg';
 import ProtectedLayout from '@/components/Protected';
@@ -16,6 +16,7 @@ import { Avatar } from '@nextui-org/avatar';
 import { Button } from '@nextui-org/button';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/dropdown';
 import { Image } from '@nextui-org/react';
+import { useRef } from 'react';
 import { MdInstallMobile } from 'react-icons/md';
 
 gsap.registerPlugin(useGSAP);
@@ -155,9 +156,12 @@ const Sidebar: FunctionComponent<{
 };
 
 const DashboardLayout: FunctionComponent = () => {
+  const { pathname } = useLocation();
   const navigate = useNavigate();
   const { isLoggedIn, user } = useAppSelector((state) => state.auth);
   const [renderCustomPWAInstallPrompt, setRenderCustomPWAInstallPrompt] = useState<Event | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
   const { contextSafe } = useGSAP();
   const handleSideBarOpen = contextSafe(() => {
     gsap
@@ -181,6 +185,13 @@ const DashboardLayout: FunctionComponent = () => {
       setRenderCustomPWAInstallPrompt(e);
     });
   }, []);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      console.log('scrolling to top');
+      containerRef.current.scroll(0, 0);
+    }
+  }, [pathname]);
 
   return (
     <RouteWrapper>
@@ -235,7 +246,7 @@ const DashboardLayout: FunctionComponent = () => {
                 )}
               </div>
             </header>
-            <section className="flex-1 overflow-auto">
+            <section ref={containerRef} className="flex-1 overflow-auto scroll-smooth">
               <Outlet />
             </section>
             {/* footer */}
