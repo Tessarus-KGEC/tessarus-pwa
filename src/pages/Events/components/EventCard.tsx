@@ -3,6 +3,7 @@ import { Card, CardBody, CardFooter, CardHeader, Chip } from '@nextui-org/react'
 import React from 'react';
 import { IoCalendar, IoLocationSharp } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
+import ImageComponent from '../../../components/Image';
 import { RoutePath } from '../../../constants/route';
 import { EventResponse } from '../../../types/response.type';
 import { formateDate } from '../../../utils/formateDate';
@@ -31,7 +32,11 @@ const EventCard: React.FC<IProps> = ({ event, isFromKGEC }) => {
   return (
     <Card className="h-full bg-none">
       <CardHeader>
-        <img className="aspect-video w-full rounded-lg object-cover" alt={event.title} src={event.eventThumbnailImage} />
+        <ImageComponent
+          // className="aspect-video w-full rounded-lg object-cover group-hover:scale-105"
+          alt={event.title}
+          src={event.eventThumbnailImage}
+        />
       </CardHeader>
       <CardBody className="space-y-2">
         <div className="flex gap-x-2">

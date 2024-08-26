@@ -1,24 +1,26 @@
-import { Image } from '@nextui-org/image';
 import { Button, Chip, User } from '@nextui-org/react';
 import MDEditor from '@uiw/react-md-editor';
-import React from 'react';
+import React, { useState } from 'react';
 import { IoCalendar, IoLocationSharp } from 'react-icons/io5';
 import { useNavigate, useParams } from 'react-router-dom';
-import { FallbacKImage, ORGANISING_CLUB_MAP } from '../../constants';
+import ImageComponent from '../../components/Image';
+import { ORGANISING_CLUB_MAP } from '../../constants';
 import { RoutePath } from '../../constants/route';
 import { useAppSelector } from '../../redux';
 import { useGetEventQuery, useGetEventsRecommendationQuery } from '../../redux/api/event.slice';
 import { formateDate } from '../../utils/formateDate';
+import { renderRazorpayPG } from '../../utils/renderRazorpayPG';
 
 const Event: React.FC = () => {
   const navigate = useNavigate();
-  const { user } = useAppSelector((state) => state.auth);
+  const { user, authToken } = useAppSelector((state) => state.auth);
   const { eventId } = useParams<{
     eventId: string;
   }>();
 
   const { data: eventData, isLoading } = useGetEventQuery({ eventId: eventId ?? '' });
   const { data: eventRecommendationData, isLoading: eventRecommendationLoading } = useGetEventsRecommendationQuery();
+  const [initiatedRegistration, setInitiatedRegistration] = useState(false);
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -32,7 +34,7 @@ const Event: React.FC = () => {
     <section className="flex flex-col gap-4 px-4 pb-6 sm:flex-row md:gap-6 md:px-6 md:pb-8">
       <article className="space-y-6 sm:flex-[2_2_0%]">
         <div>
-          <img className="aspect-video w-full rounded-lg object-cover" alt={eventData.data.title} src={eventData.data.eventCoverImage} />
+          <ImageComponent alt={eventData.data.title} src={eventData.data.eventCoverImage} scaleRatio="md" />
         </div>
         <div className="space-y-4">
           <div className="flex gap-x-2">
@@ -125,8 +127,30 @@ const Event: React.FC = () => {
             )}
           </div>
         </div>
-        <Button color="primary" className="w-full text-center md:w-[200px]">
-          Register
+        <Button
+          color="primary"
+          className="w-full text-center md:w-[200px]"
+          isLoading={initiatedRegistration}
+          isDisabled={!authToken}
+          onClick={async () => {
+            if (!authToken || !user) {
+              navigate(RoutePath.login());
+              return;
+            }
+            if (initiatedRegistration) {
+              return;
+            }
+            setInitiatedRegistration(true);
+            await renderRazorpayPG({
+              amount: (user && user.isFromKGEC ? eventData.data.eventPriceForKGEC : eventData.data.eventPrice) || 0,
+              description: eventData.data.title,
+              token: authToken,
+              orderType: 'ticket',
+            });
+            setInitiatedRegistration(false);
+          }}
+        >
+          {initiatedRegistration ? 'Processing...' : 'Register'}
         </Button>
       </article>
       <article className="w-full sm:max-w-[300px]">
@@ -146,14 +170,7 @@ const Event: React.FC = () => {
                           navigate(RoutePath.event(event._id));
                         }}
                       >
-                        <Image
-                          isZoomed
-                          isBlurred
-                          className="aspect-video w-full rounded-lg object-cover"
-                          fallbackSrc={FallbacKImage}
-                          alt={event.title}
-                          src={event.eventThumbnailImage}
-                        />
+                        <ImageComponent alt={event.title} src={event.eventThumbnailImage} />
                         <div className="flex gap-x-2">
                           <h2 className="text-lg font-semibold">{event.title}</h2>
                           <Chip

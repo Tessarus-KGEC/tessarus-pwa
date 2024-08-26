@@ -2,7 +2,7 @@ import { HttpMethod, Response } from '@/types/api.type';
 import { CreateEventResponse, EventResponse, GetAllEventsResponse } from '@/types/response.type';
 import { RootState } from '@/types/store.type';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { CreateEventArgs } from '../../types/args.type';
+import { CreateEventArgs, GetAllEventsArgs } from '../../types/args.type';
 
 export const eventApi = createApi({
   reducerPath: 'eventsApi',
@@ -19,11 +19,18 @@ export const eventApi = createApi({
     },
   }),
   endpoints: (builder) => ({
-    getAllEvents: builder.query<Response<GetAllEventsResponse>, void>({
-      query: () => ({
-        url: '/',
-        method: HttpMethod.GET,
-      }),
+    getAllEvents: builder.query<Response<GetAllEventsResponse>, GetAllEventsArgs>({
+      query: (args) => {
+        const query = new URLSearchParams();
+        if (args.page && args.limit) {
+          query.set('page', args.page.toString());
+          query.set('limit', args.limit.toString());
+        }
+        return {
+          url: `?${query.toString()}`,
+          method: HttpMethod.GET,
+        };
+      },
     }),
     createEvent: builder.mutation<Response<CreateEventResponse>, CreateEventArgs>({
       query: (args) => ({
