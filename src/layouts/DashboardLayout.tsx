@@ -1,7 +1,15 @@
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { FunctionComponent, useCallback, useEffect, useState } from 'react';
-import { IoAnalyticsOutline, IoCloseOutline, IoDocumentTextOutline, IoMenuOutline, IoScanOutline, IoWalletOutline } from 'react-icons/io5';
+import {
+  IoAnalyticsOutline,
+  IoCloseOutline,
+  IoDocumentTextOutline,
+  IoMenuOutline,
+  IoScanOutline,
+  IoTicketOutline,
+  IoWalletOutline,
+} from 'react-icons/io5';
 import { MdOutlineAdminPanelSettings, MdOutlineEvent } from 'react-icons/md';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
@@ -40,16 +48,22 @@ const navlinks: {
     icon: <IoScanOutline size={20} />,
   },
   {
-    title: 'Analytics',
-    route: Route.ANALYTICS,
+    title: 'Tickets',
+    route: Route.TICKETS,
     status: 'active',
-    icon: <IoAnalyticsOutline size={20} />,
+    icon: <IoTicketOutline size={20} />,
   },
   {
     title: 'Wallet',
     route: Route.WALLET,
     status: 'active',
     icon: <IoWalletOutline size={20} />,
+  },
+  {
+    title: 'Analytics',
+    route: Route.ANALYTICS,
+    status: 'active',
+    icon: <IoAnalyticsOutline size={20} />,
   },
   {
     title: 'Payment logs',

@@ -11,6 +11,7 @@ import NotFound from './pages/NotFound';
 import Otp from './pages/Otp';
 import PaymentLogs from './pages/PaymentLogs';
 import Signup from './pages/Signup';
+import Tickets from './pages/Tickets/Tickets';
 import UserManagement from './pages/UserManagement';
 import Wallet from './pages/Wallet';
 import { Route } from './types/route';
@@ -58,6 +59,10 @@ const appRouter = createBrowserRouter([
           {
             path: Route.CHECKIN,
             element: <Checkin />,
+          },
+          {
+            path: Route.TICKETS,
+            element: <Tickets />,
           },
           {
             path: Route.WALLET,

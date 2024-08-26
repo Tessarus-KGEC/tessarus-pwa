@@ -9,6 +9,7 @@ export enum Route {
   ANALYTICS = 'analytics',
   USER_MANAGEMENT = 'user-management',
   PAYMENT_LOGS = 'payment-logs',
+  TICKETS = 'tickets',
 }
 
 export enum RouteQuery {
