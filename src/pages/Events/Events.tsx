@@ -60,7 +60,7 @@ const Events: FunctionComponent = () => {
 
   const loadMoreEvents = async () => {
     setFetchingMoreEvents(true);
-    const data = await fetchEvents({ page, limit: 5 });
+    const data = await fetchEvents({ page, limit: 10 });
     if (data) {
       const newEventsSet = new Set([...events, ...data.events]);
       setEvents(Array.from(newEventsSet));
