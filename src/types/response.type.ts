@@ -52,6 +52,9 @@ export interface GetAllEventsResponse {
     | 'eventOrganiserClub'
   >[];
   totalCount: number;
+  nextPage: number | null;
+  currentPage: number;
+  hasMore: boolean;
 }
 
 export interface CreateEventResponse {
