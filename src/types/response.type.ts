@@ -18,6 +18,23 @@ export interface PushSubscriptionPublicKeyResponse {
   publicKey: string;
 }
 
+export interface IEvent
+  extends Pick<
+    EventResponse,
+    | '_id'
+    | 'title'
+    | 'description'
+    | 'status'
+    | 'eventPrice'
+    | 'eventPriceForKGEC'
+    | 'startTime'
+    | 'endTime'
+    | 'eventVenue'
+    | 'eventThumbnailImage'
+    | 'eventType'
+    | 'eventOrganiserClub'
+  > {}
+
 export interface GetAllEventsResponse {
   events: Pick<
     EventResponse,

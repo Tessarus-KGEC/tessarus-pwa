@@ -8,6 +8,11 @@ export interface VerifyOTPArgs {
   otp_token: string;
 }
 
+export interface GetAllEventsArgs {
+  page?: number;
+  limit?: number;
+}
+
 export interface CreateEventArgs {
   title: string;
   description: string;
