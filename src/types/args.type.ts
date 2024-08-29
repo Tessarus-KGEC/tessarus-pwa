@@ -39,3 +39,11 @@ export interface CreateEventArgs {
     image?: string;
   }[];
 }
+
+export interface BookTicketArgs {
+  eventId: string;
+  team: {
+    name: string;
+    members: string[];
+  };
+}

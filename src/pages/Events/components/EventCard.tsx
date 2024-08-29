@@ -87,9 +87,6 @@ const EventCard: React.FC<IProps> = ({ event, isFromKGEC }) => {
         >
           View more
         </Button>
-        <Button color="primary" className="w-full">
-          Register
-        </Button>
       </CardFooter>
     </Card>
   );

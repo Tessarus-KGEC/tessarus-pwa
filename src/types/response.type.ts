@@ -102,3 +102,9 @@ export interface EventResponse {
     image?: string;
   }[];
 }
+
+export interface BookTicketResponse {
+  _id: string;
+  ticketNumber: string;
+  order?: string;
+}

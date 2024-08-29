@@ -4,12 +4,25 @@ import React, { useState } from 'react';
 import { IoCalendar, IoLocationSharp } from 'react-icons/io5';
 import { useNavigate, useParams } from 'react-router-dom';
 import ImageComponent from '../../components/Image';
+import Ticket from '../../components/Ticket';
 import { ORGANISING_CLUB_MAP } from '../../constants';
 import { RoutePath } from '../../constants/route';
 import { useAppSelector } from '../../redux';
 import { useGetEventQuery, useGetEventsRecommendationQuery } from '../../redux/api/event.slice';
 import { formateDate } from '../../utils/formateDate';
-import { renderRazorpayPG } from '../../utils/renderRazorpayPG';
+import TeamDetailsForm from './components/TeamDetailsForm';
+
+interface IUser {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+  college: string;
+  isFromKGEC: boolean;
+  isVolunteer: boolean;
+  profileImageUrl: string;
+  espektroId: string;
+}
 
 const Event: React.FC = () => {
   const navigate = useNavigate();
@@ -18,9 +31,13 @@ const Event: React.FC = () => {
     eventId: string;
   }>();
 
+  const [isTeamDetailsFormVisible, setIsTeamDetailsFormVisible] = useState(false);
+  const [ticketId, setTicketId] = useState<string | null>(null);
+  const [teamName, setTeamName] = useState('');
+  const [teamMembers, setTeamMembers] = useState<IUser[]>([]);
   const { data: eventData, isLoading } = useGetEventQuery({ eventId: eventId ?? '' });
   const { data: eventRecommendationData, isLoading: eventRecommendationLoading } = useGetEventsRecommendationQuery();
-  const [initiatedRegistration, setInitiatedRegistration] = useState(false);
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -127,31 +144,28 @@ const Event: React.FC = () => {
             )}
           </div>
         </div>
-        <Button
-          color="primary"
-          className="w-full text-center md:w-[200px]"
-          isLoading={initiatedRegistration}
-          isDisabled={!authToken}
-          onClick={async () => {
-            if (!authToken || !user) {
-              navigate(RoutePath.login());
-              return;
-            }
-            if (initiatedRegistration) {
-              return;
-            }
-            setInitiatedRegistration(true);
-            await renderRazorpayPG({
-              amount: (user && user.isFromKGEC ? eventData.data.eventPriceForKGEC : eventData.data.eventPrice) || 0,
-              description: eventData.data.title,
-              token: authToken,
-              orderType: 'ticket',
-            });
-            setInitiatedRegistration(false);
-          }}
-        >
-          {initiatedRegistration ? 'Processing...' : 'Register'}
-        </Button>
+        <Ticket />
+
+        {ticketId ? (
+          <Button color="secondary" className="w-full text-center md:w-[200px]">
+            View Ticket
+          </Button>
+        ) : (
+          <Button
+            color="primary"
+            className="w-full text-center font-semibold text-background md:w-[200px]"
+            isDisabled={!authToken}
+            onClick={async () => {
+              if (!authToken || !user) {
+                navigate(RoutePath.login());
+                return;
+              }
+              setIsTeamDetailsFormVisible(true);
+            }}
+          >
+            Register
+          </Button>
+        )}
       </article>
       <article className="w-full sm:max-w-[300px]">
         <h2 className="text-xl font-semibold">Recommanded events</h2>
@@ -215,6 +229,17 @@ const Event: React.FC = () => {
           )}
         </>
       </article>
+
+      <TeamDetailsForm
+        isOpen={isTeamDetailsFormVisible}
+        onClose={() => setIsTeamDetailsFormVisible(false)}
+        minTeamSize={eventData.data.minTeamMembersSize ?? 1}
+        maxTeamSize={eventData.data.maxTeamMembersSize ?? 1}
+        setTeam={([teamName, teamMembers]) => {
+          setTeamName(teamName);
+          setTeamMembers(teamMembers);
+        }}
+      />
     </section>
   );
 };
