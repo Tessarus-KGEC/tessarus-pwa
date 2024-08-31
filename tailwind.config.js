@@ -43,7 +43,7 @@ export default {
             },
             primary: {
               foreground: '#E7E9FF',
-              DEFAULT: '#8870FF',
+              DEFAULT: '#5D43E7',
             },
           },
         },

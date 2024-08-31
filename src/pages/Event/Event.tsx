@@ -1,7 +1,8 @@
 import { Button, Chip, User } from '@nextui-org/react';
 import MDEditor from '@uiw/react-md-editor';
-import React, { useState } from 'react';
-import { IoCalendar, IoLocationSharp } from 'react-icons/io5';
+import React, { useMemo, useState } from 'react';
+import { IoCalendar, IoLocationSharp, IoTicketOutline } from 'react-icons/io5';
+import { MdOutlineModeEditOutline } from 'react-icons/md';
 import { useNavigate, useParams } from 'react-router-dom';
 import ImageComponent from '../../components/Image';
 import Ticket from '../../components/Ticket';
@@ -37,6 +38,8 @@ const Event: React.FC = () => {
   const [teamMembers, setTeamMembers] = useState<IUser[]>([]);
   const { data: eventData, isLoading } = useGetEventQuery({ eventId: eventId ?? '' });
   const { data: eventRecommendationData, isLoading: eventRecommendationLoading } = useGetEventsRecommendationQuery();
+
+  const isTeamCreated = useMemo(() => teamName && teamMembers.length > 0, [teamName, teamMembers]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -144,16 +147,22 @@ const Event: React.FC = () => {
             )}
           </div>
         </div>
-        <Ticket />
+        {isTeamCreated ? (
+          <Ticket
+            eventName={eventData.data.title}
+            eventVenue={eventData.data.eventVenue}
+            eventStartDate={eventData.data.startTime}
+            eventEndDate={eventData.data.endTime}
+            teamName={teamName}
+            teamMembers={teamMembers.map((member) => member.name)}
+            isTicketBooked={!!ticketId}
+          />
+        ) : null}
 
-        {ticketId ? (
-          <Button color="secondary" className="w-full text-center md:w-[200px]">
-            View Ticket
-          </Button>
-        ) : (
+        {!isTeamCreated ? (
           <Button
-            color="primary"
-            className="w-full text-center font-semibold text-background md:w-[200px]"
+            color={'primary'}
+            className="w-full text-center font-semibold md:w-[200px]"
             isDisabled={!authToken}
             onClick={async () => {
               if (!authToken || !user) {
@@ -165,7 +174,29 @@ const Event: React.FC = () => {
           >
             Register
           </Button>
-        )}
+        ) : null}
+
+        <div className="flex flex-wrap gap-4">
+          {isTeamCreated ? (
+            <Button
+              color={'default'}
+              className="w-full max-w-[300px] flex-1 text-center font-semibold"
+              onClick={async () => {
+                setIsTeamDetailsFormVisible(true);
+              }}
+            >
+              <MdOutlineModeEditOutline size={20} />
+              Edit team
+            </Button>
+          ) : null}
+
+          {isTeamCreated ? (
+            <Button color="primary" className="w-full max-w-[300px] flex-1 text-center">
+              <IoTicketOutline size={20} />
+              Book Ticket
+            </Button>
+          ) : null}
+        </div>
       </article>
       <article className="w-full sm:max-w-[300px]">
         <h2 className="text-xl font-semibold">Recommanded events</h2>
@@ -235,6 +266,8 @@ const Event: React.FC = () => {
         onClose={() => setIsTeamDetailsFormVisible(false)}
         minTeamSize={eventData.data.minTeamMembersSize ?? 1}
         maxTeamSize={eventData.data.maxTeamMembersSize ?? 1}
+        teamName={teamName}
+        teamMembers={teamMembers}
         setTeam={([teamName, teamMembers]) => {
           setTeamName(teamName);
           setTeamMembers(teamMembers);

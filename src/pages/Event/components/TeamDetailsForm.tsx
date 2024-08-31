@@ -10,6 +10,8 @@ interface IProps {
   onClose: () => void;
   minTeamSize: number;
   maxTeamSize: number;
+  teamName: string;
+  teamMembers: IUser[];
   setTeam: ([teamName, members]: [string, IUser[]]) => void;
 }
 
@@ -30,9 +32,10 @@ interface IUser {
   espektroId: string;
 }
 
-const TeamDetailsForm: React.FC<IProps> = ({ isOpen, onClose, minTeamSize, maxTeamSize, setTeam }) => {
+const TeamDetailsForm: React.FC<IProps> = ({ isOpen, onClose, minTeamSize, maxTeamSize, teamName = '', teamMembers = [], setTeam }) => {
+  console.log('TeamDetailsForm', teamName, teamMembers);
   const { user } = useAppSelector((state) => state.auth);
-  const [teamName, setTeamName] = useState('');
+  const [name, setName] = useState('');
   const [members, setMembers] = useState<IUser[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -47,8 +50,18 @@ const TeamDetailsForm: React.FC<IProps> = ({ isOpen, onClose, minTeamSize, maxTe
   };
 
   useEffect(() => {
-    if (isOpen && user) {
-      setMembers([
+    if (teamName) {
+      setName(teamName);
+    }
+    if (teamMembers.length > 0) {
+      setMembers(teamMembers);
+    }
+  }, [teamName, teamMembers, isOpen]);
+
+  useEffect(() => {
+    if (isOpen && user && teamMembers.length === 0) {
+      setMembers((prev) => [
+        ...prev,
         {
           _id: user._id,
           name: user.name,
@@ -71,7 +84,7 @@ const TeamDetailsForm: React.FC<IProps> = ({ isOpen, onClose, minTeamSize, maxTe
 
   const handleClose = () => {
     setSearchQuery('');
-    setTeamName('');
+    setName('');
     setMembers([]);
     onClose();
   };
@@ -136,8 +149,8 @@ const TeamDetailsForm: React.FC<IProps> = ({ isOpen, onClose, minTeamSize, maxTe
         <ModalBody>
           <form>
             <Input
-              value={teamName}
-              onChange={(e) => setTeamName(e.target.value)}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               isRequired
               type="text"
               label="Team Name"
@@ -236,7 +249,7 @@ const TeamDetailsForm: React.FC<IProps> = ({ isOpen, onClose, minTeamSize, maxTe
           <Button
             color="primary"
             onClick={() => {
-              if (teamName.trim() === '') {
+              if (name.trim() === '') {
                 toast.error('Team name is required');
                 return;
               }
@@ -244,7 +257,7 @@ const TeamDetailsForm: React.FC<IProps> = ({ isOpen, onClose, minTeamSize, maxTe
                 toast.error(`Minimum team size is ${minTeamSize}`);
                 return;
               }
-              setTeam([teamName, members]);
+              setTeam([name, members]);
               handleClose();
             }}
             // onPress={async () => {
