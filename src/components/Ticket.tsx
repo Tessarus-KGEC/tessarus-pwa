@@ -1,3 +1,4 @@
+import useMediaQuery from '@/hooks/useMedia';
 import React from 'react';
 import Barcode from 'react-barcode';
 import { IoLocationSharp } from 'react-icons/io5';
@@ -22,15 +23,24 @@ const Ticket: React.FC<ITicketProps> = ({
   teamMembers,
   isTicketBooked = false,
 }) => {
+  const isExtraSmall = useMediaQuery('(max-width: 330px)');
   return (
-    <article className="relative flex w-[335px] flex-col rounded-2xl bg-default-100 font-mono">
-      <div className="m-2 rounded-xl bg-primary">
-        <Barcode value={ticketId} displayValue={true} fontSize={15} background="transparent" width={1} height={60} marginBottom={20} />
+    <article className="relative flex w-full flex-col rounded-2xl bg-default-100 font-mono xxs:max-w-[310px]">
+      <div className="m-2 flex justify-center rounded-xl bg-primary">
+        <Barcode
+          value={ticketId}
+          displayValue={true}
+          fontSize={15}
+          background="transparent"
+          width={1}
+          height={isExtraSmall ? 50 : 60}
+          marginBottom={isExtraSmall ? 15 : 20}
+        />
       </div>
       <div
         className={`relative space-y-4 border-t-4 border-dotted border-default-300 p-4 before:absolute before:left-0 before:top-0 before:h-8 before:w-8 before:translate-x-[-50%] before:translate-y-[-50%] before:rounded-full before:bg-background after:absolute after:right-0 after:top-0 after:h-8 after:w-8 after:translate-x-[50%] after:translate-y-[-50%] after:rounded-full after:bg-background`}
       >
-        <h2 className="mb-6 max-w-[280px] text-3xl">{eventName}</h2>
+        <h2 className="mb-6 max-w-[280px] text-2xl">{eventName}</h2>
         <div className="flex">
           <div className="flex-1 space-y-2 font-mono">
             <p className="px-2 text-sm text-default-500">FROM</p>
@@ -65,7 +75,7 @@ const Ticket: React.FC<ITicketProps> = ({
         <div className="mb-6 space-y-5">
           <div className="space-y-2">
             <p className="w-fit border-b-1 border-default-500 pb-2 pr-6 font-mono text-sm text-default-500">Team name</p>
-            <p className="text-xl font-semibold">{teamName}</p>
+            <p className="text-lg font-semibold">{teamName}</p>
           </div>
           <div className="space-y-3">
             <p className="w-fit border-b-1 border-default-500 pb-2 pr-6 font-mono text-sm text-default-500">Team members</p>
