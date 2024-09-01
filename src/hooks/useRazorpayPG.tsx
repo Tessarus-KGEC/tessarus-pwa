@@ -2,7 +2,7 @@
 
 import { useCreatePaymentOrderMutation } from '@/redux/api/payment.slice';
 import { CreatePaymentOrderArgs } from '@/types/args.type';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 declare global {
   interface Window {
@@ -10,6 +10,7 @@ declare global {
   }
 }
 const useRazorpayPG = () => {
+  const [isPaymentLoading, setIsPaymentLoading] = useState(false);
   const [createOrder] = useCreatePaymentOrderMutation();
   /**
    * For loading the Razorpay script, UI
@@ -46,6 +47,7 @@ const useRazorpayPG = () => {
         paymentSuccessCallback: (orderId: string) => Promise<void>;
       },
     ) => {
+      setIsPaymentLoading(true);
       const orderData = await createOrder({
         amount: args.amount,
         orderType: args.orderType,
@@ -63,20 +65,22 @@ const useRazorpayPG = () => {
         name: 'Tessarus KGEC',
         description: args.description,
         //   image: 'https://res.cloudinary.com/dvgapxbzj/image/upload/v1724550854/tessarus-25/xnyvvlkmx2r4axb7ptvx.png',
-        order_id: orderData.data.orderId,
+        order_id: orderData.data.razorpayOrderId,
         theme: {
           color: '#554ccc',
         },
         handler: async function (response: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string }) {
-          if (response.razorpay_payment_id) await args.paymentSuccessCallback(orderData.data.orderId);
+          if (response.razorpay_payment_id) await args.paymentSuccessCallback(orderData.data.order._id);
+          setIsPaymentLoading(false);
         },
       };
+      console.log(options);
       const paymentObject = new window.Razorpay(options);
       paymentObject.open();
     },
     [createOrder],
   );
-  return { handlePaymentGatewayRender };
+  return { handlePaymentGatewayRender, isPaymentLoading };
 };
 
 export default useRazorpayPG;

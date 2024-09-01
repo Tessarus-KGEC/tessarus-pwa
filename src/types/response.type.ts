@@ -131,6 +131,9 @@ export interface TicketResponse {
 }
 
 export interface CreatePaymentOrderResponse {
-  orderId: string;
+  order: {
+    _id: string;
+  };
+  razorpayOrderId: string;
   amount: number;
 }
