@@ -1,6 +1,17 @@
+import EspektroLogo from '@/assets/logo/Espektro logo fill.svg';
+import ProtectedLayout from '@/components/Protected';
+import { RoutePath } from '@/constants/route';
+import { useAppDispatch, useAppSelector } from '@/redux';
+import { logout } from '@/redux/reducers/auth.reducer';
+import RouteWrapper from '@/redux/RouteWrapper';
+import { Route } from '@/types/route';
 import { useGSAP } from '@gsap/react';
+import { Avatar } from '@nextui-org/avatar';
+import { Button } from '@nextui-org/button';
+import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/dropdown';
+import { Image } from '@nextui-org/react';
 import gsap from 'gsap';
-import { FunctionComponent, useCallback, useEffect, useState } from 'react';
+import { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
 import {
   IoAnalyticsOutline,
   IoCloseOutline,
@@ -10,71 +21,65 @@ import {
   IoTicketOutline,
   IoWalletOutline,
 } from 'react-icons/io5';
-import { MdOutlineAdminPanelSettings, MdOutlineEvent } from 'react-icons/md';
+import { MdInstallMobile, MdOutlineAdminPanelSettings, MdOutlineEvent } from 'react-icons/md';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
-import EspektroLogo from '@/assets/logo/Espektro logo fill.svg';
-import ProtectedLayout from '@/components/Protected';
-import { RoutePath } from '@/constants/route';
-import { useAppDispatch, useAppSelector } from '@/redux';
-import { logout } from '@/redux/reducers/auth.reducer';
-import RouteWrapper from '@/redux/RouteWrapper';
-import { Route } from '@/types/route';
-import { Avatar } from '@nextui-org/avatar';
-import { Button } from '@nextui-org/button';
-import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/dropdown';
-import { Image } from '@nextui-org/react';
-import { useRef } from 'react';
-import { MdInstallMobile } from 'react-icons/md';
-
 gsap.registerPlugin(useGSAP);
-
+const dashboardPath = '/dashboard';
 const navlinks: {
   title: string;
   route: string;
   status: 'active' | 'inactive';
+  slug: string;
   icon: JSX.Element;
 }[] = [
   {
     title: 'Events',
     route: Route.EVENTS,
     status: 'active',
+    slug: `${dashboardPath}/${Route.EVENTS}`,
     icon: <MdOutlineEvent size={20} />,
   },
   {
     title: 'Check in',
     route: Route.CHECKIN,
     status: 'active',
+    slug: `${dashboardPath}/${Route.CHECKIN}`,
     icon: <IoScanOutline size={20} />,
   },
   {
-    title: 'Tickets',
-    route: Route.TICKETS,
+    title: 'Registered events',
+    route: `${Route.EVENTS}/${Route.REGISTERED_EVENTS}`,
     status: 'active',
+    slug: `${dashboardPath}/${Route.EVENTS}/${Route.REGISTERED_EVENTS}`,
     icon: <IoTicketOutline size={20} />,
   },
   {
     title: 'Wallet',
     route: Route.WALLET,
     status: 'active',
+    slug: `${dashboardPath}/${Route.WALLET}`,
     icon: <IoWalletOutline size={20} />,
   },
   {
     title: 'Analytics',
     route: Route.ANALYTICS,
     status: 'active',
+    slug: `${dashboardPath}/${Route.ANALYTICS}`,
     icon: <IoAnalyticsOutline size={20} />,
   },
   {
-    title: 'Payment logs',
-    route: Route.PAYMENT_LOGS,
+    title: 'Transactions',
+    route: Route.TRANSACTIONS,
     status: 'active',
+    slug: `${dashboardPath}/${Route.TRANSACTIONS}`,
     icon: <IoDocumentTextOutline size={20} />,
   },
   {
     title: 'User management',
     route: Route.USER_MANAGEMENT,
     status: 'active',
+    slug: `${dashboardPath}/${Route.USER_MANAGEMENT}`,
     icon: <MdOutlineAdminPanelSettings size={20} />,
   },
 ];
@@ -118,7 +123,7 @@ const Sidebar: FunctionComponent<{
 }> = ({ handleClose, classname, hideClose, renderCustomPWAInstallPrompt }) => {
   const { activeRoute } = useAppSelector((state) => state.route);
 
-  const isActiveRoute = useCallback((title: string) => activeRoute.includes(title), [activeRoute]);
+  const isActiveRoute = useCallback((slug: string) => activeRoute === slug, [activeRoute]);
 
   return (
     <nav
@@ -141,7 +146,7 @@ const Sidebar: FunctionComponent<{
             return (
               <Link key={link.route} to={`/dashboard/${link.route}`}>
                 <div
-                  className={`flex items-center gap-2 rounded-xl px-4 py-2 ${isActiveRoute(link.route) ? 'bg-default-200 text-default-600' : 'text-default-500'} hover:bg-default-200 hover:text-default-600`}
+                  className={`flex items-center gap-2 rounded-xl px-4 py-2 ${isActiveRoute(link.slug) ? 'bg-default-200 text-default-600' : 'text-default-500'} hover:bg-default-200 hover:text-default-600`}
                 >
                   <span>{link.icon}</span>
                   {link.title}

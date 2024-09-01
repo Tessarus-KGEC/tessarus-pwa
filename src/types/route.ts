@@ -8,8 +8,8 @@ export enum Route {
   WALLET = 'wallet',
   ANALYTICS = 'analytics',
   USER_MANAGEMENT = 'user-management',
-  PAYMENT_LOGS = 'payment-logs',
-  TICKETS = 'tickets',
+  TRANSACTIONS = 'transactions',
+  REGISTERED_EVENTS = `registered`,
 }
 
 export enum RouteQuery {

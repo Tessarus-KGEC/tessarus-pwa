@@ -1,6 +1,6 @@
 import { Button } from '@nextui-org/button';
 import { ScrollShadow } from '@nextui-org/react';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { IoAdd, IoFilter } from 'react-icons/io5';
@@ -15,8 +15,10 @@ import CreateEventForm from './components/CreateEventForm';
 import EventCard from './components/EventCard';
 import FilterForm from './components/FilterForm';
 
-const Events: FunctionComponent = () => {
-  const { user } = useAppSelector((state) => state.auth);
+const Events: FunctionComponent<{
+  registeredEventsOnly?: boolean;
+}> = ({ registeredEventsOnly = false }) => {
+  const { user, authToken } = useAppSelector((state) => state.auth);
   const [isFilterOpened, setIsFilterOpened] = useState(false);
   const [isCreateEventFormOpen, setIsCreateEventFormOpen] = useState(false);
   const [events, setEvents] = useState<IEvent[]>([]);
@@ -29,13 +31,16 @@ const Events: FunctionComponent = () => {
 
   const observer = useRef<IntersectionObserver | null>(null);
 
-  const fetchEvents = async ({ page, limit }: { page: number; limit: number }) => {
+  const fetchEvents = async ({ page, limit, registeredOnly = false }: { page: number; limit: number; registeredOnly?: boolean }) => {
     try {
       const query = new URLSearchParams();
       if (page && limit) {
-        query.set('page', page.toString());
-        query.set('limit', limit.toString());
+        query.append('page', page.toString());
+        query.append('limit', limit.toString());
       }
+
+      if (registeredOnly && !authToken) return null;
+
       const resp = await axios.get<{
         data: {
           events: IEvent[];
@@ -44,15 +49,21 @@ const Events: FunctionComponent = () => {
           currentPage: number;
           hasMore: boolean;
         };
-      }>(`${import.meta.env.VITE_API_URL}/events?${query.toString()}`, {
+      }>(`${import.meta.env.VITE_API_URL}/events${registeredOnly ? '/registered' : ''}?${query.toString()}`, {
         headers: {
           'ngrok-skip-browser-warning': 'true',
           'Content-Type': 'application/json',
+          ...(registeredOnly ? { Authorization: `Bearer ${authToken}` } : {}),
         },
       });
 
       return resp.data.data;
     } catch (error) {
+      console.error(error);
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data.message || 'Error fetching events');
+        return null;
+      }
       toast.error('Error fetching events');
       return null;
     }
@@ -60,7 +71,7 @@ const Events: FunctionComponent = () => {
 
   const loadMoreEvents = async () => {
     setFetchingMoreEvents(true);
-    const data = await fetchEvents({ page, limit: 10 });
+    const data = await fetchEvents({ page, limit: 10, registeredOnly: registeredEventsOnly });
     if (data) {
       const newEventsSet = new Set([...events, ...data.events]);
       setEvents(Array.from(newEventsSet));
@@ -72,7 +83,7 @@ const Events: FunctionComponent = () => {
   useEffect(() => {
     loadMoreEvents();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page]);
+  }, [page, registeredEventsOnly]);
 
   const lastEventCardRef = useCallback(
     (node: HTMLLIElement) => {
@@ -103,13 +114,13 @@ const Events: FunctionComponent = () => {
   return (
     <div ref={eventPageRef} className="flex h-full flex-1 flex-grow-0 flex-col gap-4">
       <div className="space-y-4 px-4">
-        <h1 className="text-2xl">Ongoing Events</h1>
+        <h1 className="text-2xl">{registeredEventsOnly ? 'Registered Events' : 'Events'}</h1>
         <div className="flex gap-4">
-          <SearchBar placeholder="Search your favorite event..." />
+          <SearchBar placeholder={`Search your ${registeredEventsOnly ? 'registered' : 'favourite'} event...`} />
           <Button isIconOnly color="default" aria-label="Like" onClick={() => setIsFilterOpened(!isFilterOpened)}>
             <IoFilter size={24} />
           </Button>
-          {!user || !user.isFromKGEC || !user.permissions.includes(PERMISSIONS.CREATE_EVENT) ? null : (
+          {!user || !user.isFromKGEC || !user.permissions.includes(PERMISSIONS.CREATE_EVENT) || registeredEventsOnly ? null : (
             <Button
               isIconOnly={isMobile}
               color="primary"

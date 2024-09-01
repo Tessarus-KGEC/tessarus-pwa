@@ -9,9 +9,8 @@ import Events from './pages/Events/Events';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
 import Otp from './pages/Otp';
-import PaymentLogs from './pages/PaymentLogs';
 import Signup from './pages/Signup';
-import Tickets from './pages/Tickets/Tickets';
+import Transactions from './pages/Transactions/Transactions';
 import UserManagement from './pages/UserManagement';
 import Wallet from './pages/Wallet';
 import { Route } from './types/route';
@@ -50,7 +49,16 @@ const appRouter = createBrowserRouter([
         children: [
           {
             path: Route.EVENTS,
-            element: <Events />,
+            children: [
+              {
+                index: true,
+                element: <Events />,
+              },
+              {
+                path: Route.REGISTERED_EVENTS,
+                element: <Events registeredEventsOnly={true} />,
+              },
+            ],
           },
           {
             path: `${Route.EVENTS}/:eventId`,
@@ -61,10 +69,6 @@ const appRouter = createBrowserRouter([
             element: <Checkin />,
           },
           {
-            path: Route.TICKETS,
-            element: <Tickets />,
-          },
-          {
             path: Route.WALLET,
             element: <Wallet />,
           },
@@ -73,8 +77,8 @@ const appRouter = createBrowserRouter([
             element: <Analytics />,
           },
           {
-            path: Route.PAYMENT_LOGS,
-            element: <PaymentLogs />,
+            path: Route.TRANSACTIONS,
+            element: <Transactions />,
           },
           {
             path: Route.USER_MANAGEMENT,
