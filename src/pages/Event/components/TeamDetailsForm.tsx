@@ -34,8 +34,8 @@ interface IUser {
 
 const TeamDetailsForm: React.FC<IProps> = ({ isOpen, onClose, minTeamSize, maxTeamSize, teamName = '', teamMembers = [], setTeam }) => {
   const { user } = useAppSelector((state) => state.auth);
-  const [name, setName] = useState('');
-  const [members, setMembers] = useState<IUser[]>([]);
+  const [name, setName] = useState(teamName);
+  const [members, setMembers] = useState<IUser[]>(teamMembers);
   const [searchQuery, setSearchQuery] = useState('');
 
   const [searchResults, setSearchResults] = useState<IUser[]>([]);
@@ -49,18 +49,13 @@ const TeamDetailsForm: React.FC<IProps> = ({ isOpen, onClose, minTeamSize, maxTe
   };
 
   useEffect(() => {
-    if (teamName) {
-      setName(teamName);
-    }
-    if (teamMembers.length > 0) {
-      setMembers(teamMembers);
-    }
+    setName(teamName);
+    setMembers(teamMembers);
   }, [teamName, teamMembers, isOpen]);
 
   useEffect(() => {
     if (isOpen && user && teamMembers.length === 0) {
-      setMembers((prev) => [
-        ...prev,
+      setMembers([
         {
           _id: user._id,
           name: user.name,
@@ -87,59 +82,6 @@ const TeamDetailsForm: React.FC<IProps> = ({ isOpen, onClose, minTeamSize, maxTe
     setMembers([]);
     onClose();
   };
-
-  //   const handleBookTicket = async () => {
-  //     try {
-  //       if (teamName.trim() === '') {
-  //         toast.error('Team name is required');
-  //         return;
-  //       }
-  //       if (members.length < minTeamSize) {
-  //         toast.error(`Minimum team size is ${minTeamSize}`);
-  //         return;
-  //       }
-  //       const ticketResponse = await bookTicket({
-  //         eventId: event._id,
-  //         team: {
-  //           name: teamName,
-  //           members: members.map((mem) => mem._id),
-  //         },
-  //       }).unwrap();
-  //       console.log(ticketResponse);
-  //       if (ticketResponse.status === 201) {
-  //         toast.success('Ticket booked successfully');
-  //         setTicket(ticketResponse.data._id);
-  //         handleClose();
-  //       }
-  //     } catch (error) {
-  //       console.error(error);
-  //       // TODO: if failed to book ticket, we should refund the payment
-  //       toast.error('Failed to book ticket');
-  //     }
-  //   };
-
-  //   const handleTicketPurchase = async () => {
-  //     try {
-  //       if (!user || !authToken) {
-  //         toast.error('Unauthorized access');
-  //         return;
-  //       }
-  //       //handle payment
-  //       await renderRazorpayPG({
-  //         amount: (user && user.isFromKGEC ? event.eventPriceForKGEC : event.eventPrice) || event.eventPrice,
-  //         description: event.title,
-  //         token: authToken,
-  //         orderType: 'ticket',
-  //         paymentSuccessCallback: async () => {
-  //           await handleBookTicket();
-  //         },
-  //       });
-  //       return;
-  //     } catch (error) {
-  //       toast.error('Ticket purchase failed');
-  //       return;
-  //     }
-  //   };
 
   return (
     <Modal size="sm" isOpen={isOpen} onClose={handleClose} className="bg-default-50 text-default-foreground dark">
