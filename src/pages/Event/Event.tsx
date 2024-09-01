@@ -1,6 +1,10 @@
+import useRazorpayPG from '@/hooks/useRazorpayPG';
+import { useBookTicketMutation, useGetTicketByEventQuery } from '@/redux/api/ticket.slice';
+import { UserSelfResponse } from '@/types/response.type';
 import { Button, Chip, User } from '@nextui-org/react';
 import MDEditor from '@uiw/react-md-editor';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import toast from 'react-hot-toast';
 import { IoCalendar, IoLocationSharp, IoTicketOutline } from 'react-icons/io5';
 import { MdOutlineModeEditOutline } from 'react-icons/md';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -13,33 +17,103 @@ import { useGetEventQuery, useGetEventsRecommendationQuery } from '../../redux/a
 import { formateDate } from '../../utils/formateDate';
 import TeamDetailsForm from './components/TeamDetailsForm';
 
-interface IUser {
-  _id: string;
-  name: string;
-  email: string;
-  phone: string;
-  college: string;
-  isFromKGEC: boolean;
-  isVolunteer: boolean;
-  profileImageUrl: string;
-  espektroId: string;
-}
+interface ITeamMember
+  extends Pick<UserSelfResponse, '_id' | 'name' | 'email' | 'phone' | 'college' | 'espektroId' | 'isFromKGEC' | 'isVolunteer' | 'profileImageUrl'> {}
 
 const Event: React.FC = () => {
   const navigate = useNavigate();
-  const { user, authToken } = useAppSelector((state) => state.auth);
+  const { user, isLoggedIn } = useAppSelector((state) => state.auth);
   const { eventId } = useParams<{
     eventId: string;
   }>();
 
   const [isTeamDetailsFormVisible, setIsTeamDetailsFormVisible] = useState(false);
-  const [ticketId, setTicketId] = useState<string | null>(null);
   const [teamName, setTeamName] = useState('');
-  const [teamMembers, setTeamMembers] = useState<IUser[]>([]);
-  const { data: eventData, isLoading } = useGetEventQuery({ eventId: eventId ?? '' });
+  const [teamMembers, setTeamMembers] = useState<ITeamMember[]>([]);
+  const [bookedTicketId, setBookedTicketId] = useState<string>();
+
+  const { data: eventData, isLoading } = useGetEventQuery(
+    { eventId: eventId ?? '' },
+    {
+      refetchOnMountOrArgChange: true,
+    },
+  );
   const { data: eventRecommendationData, isLoading: eventRecommendationLoading } = useGetEventsRecommendationQuery();
+  const { data: eventTicket } = useGetTicketByEventQuery(
+    { eventId: eventId ?? '' },
+    {
+      refetchOnMountOrArgChange: true,
+    },
+  );
+  const [bookTicket, { isLoading: isBookTicketLoading }] = useBookTicketMutation();
+
+  const { handlePaymentGatewayRender } = useRazorpayPG();
+
+  useEffect(() => {
+    if (eventTicket?.status === 200) {
+      setBookedTicketId(eventTicket.data._id);
+      setTeamName(eventTicket.data.team?.name ?? '');
+      setTeamMembers(eventTicket.data.team?.members ?? []);
+    } else {
+      setTeamName('');
+      setTeamMembers([]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [eventTicket]);
 
   const isTeamCreated = useMemo(() => teamName && teamMembers.length > 0, [teamName, teamMembers]);
+
+  const handleBookTicket = async (orderId?: string) => {
+    try {
+      if (!eventId) return;
+      const ticketResponse = await bookTicket({
+        eventId,
+        orderId,
+        team: {
+          name: teamName,
+          members: teamMembers.map((mem) => mem._id),
+        },
+      }).unwrap();
+      console.log(ticketResponse);
+      if (ticketResponse.status === 201) {
+        setBookedTicketId(ticketResponse.data._id);
+        toast.success('Ticket booked successfully');
+      }
+      return;
+    } catch (error) {
+      console.error(error);
+      // TODO: if failed to book ticket, we should refund the payment
+      toast.error('Failed to book ticket');
+    }
+  };
+
+  const handleTicketPurchase = async ({
+    isFromKGEC,
+    eventPrice,
+    eventPriceForKGEC,
+    title,
+  }: {
+    isFromKGEC: boolean;
+    eventPrice: number;
+    eventPriceForKGEC: number;
+    title: string;
+  }) => {
+    try {
+      //handle payment
+      await handlePaymentGatewayRender({
+        amount: (isFromKGEC ? eventPriceForKGEC : eventPrice) || eventPrice,
+        description: title,
+        orderType: 'ticket',
+        paymentSuccessCallback: async (orderId) => {
+          await handleBookTicket(orderId);
+        },
+      });
+      return;
+    } catch (error) {
+      toast.error('Ticket purchase failed');
+      return;
+    }
+  };
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -147,25 +221,28 @@ const Event: React.FC = () => {
             )}
           </div>
         </div>
-        {isTeamCreated ? (
+        {isTeamCreated || bookedTicketId ? (
           <Ticket
+            ticketId={bookedTicketId}
             eventName={eventData.data.title}
             eventVenue={eventData.data.eventVenue}
             eventStartDate={eventData.data.startTime}
             eventEndDate={eventData.data.endTime}
             teamName={teamName}
             teamMembers={teamMembers.map((member) => member.name)}
-            isTicketBooked={!!ticketId}
+            isTicketBooked={!!bookedTicketId}
           />
         ) : null}
 
-        {!isTeamCreated ? (
+        {}
+
+        {!isTeamCreated && !bookedTicketId ? (
           <Button
             color={'primary'}
             className="w-full text-center font-semibold md:w-[200px]"
-            isDisabled={!authToken}
+            isDisabled={!isLoggedIn}
             onClick={async () => {
-              if (!authToken || !user) {
+              if (!isLoggedIn || !user) {
                 navigate(RoutePath.login());
                 return;
               }
@@ -176,8 +253,14 @@ const Event: React.FC = () => {
           </Button>
         ) : null}
 
+        {/* {bookedTicketId ? (
+          <Button color={'default'} className="w-full text-center font-semibold md:w-[200px]">
+            View Ticket
+          </Button>
+        ) : null} */}
+
         <div className="flex flex-wrap gap-4">
-          {isTeamCreated ? (
+          {isTeamCreated && !bookedTicketId ? (
             <Button
               color={'default'}
               className="w-full max-w-[300px] flex-1 text-center font-semibold"
@@ -190,8 +273,23 @@ const Event: React.FC = () => {
             </Button>
           ) : null}
 
-          {isTeamCreated ? (
-            <Button color="primary" className="w-full max-w-[300px] flex-1 text-center">
+          {isTeamCreated && !bookedTicketId ? (
+            <Button
+              isLoading={isBookTicketLoading}
+              color="primary"
+              className="w-full max-w-[300px] flex-1 text-center"
+              onPress={async () => {
+                const isFreeEvent = eventData.data.eventPrice === 0 || eventData.data.eventPriceForKGEC === 0;
+                if (isFreeEvent) await handleBookTicket();
+                else
+                  await handleTicketPurchase({
+                    isFromKGEC: user?.isFromKGEC ?? false,
+                    eventPrice: eventData.data.eventPrice,
+                    eventPriceForKGEC: eventData.data.eventPriceForKGEC ?? 0,
+                    title: eventData.data.title,
+                  });
+              }}
+            >
               <IoTicketOutline size={20} />
               Book Ticket
             </Button>
@@ -263,7 +361,9 @@ const Event: React.FC = () => {
 
       <TeamDetailsForm
         isOpen={isTeamDetailsFormVisible}
-        onClose={() => setIsTeamDetailsFormVisible(false)}
+        onClose={() => {
+          setIsTeamDetailsFormVisible(false);
+        }}
         minTeamSize={eventData.data.minTeamMembersSize ?? 1}
         maxTeamSize={eventData.data.maxTeamMembersSize ?? 1}
         teamName={teamName}

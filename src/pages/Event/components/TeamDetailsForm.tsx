@@ -33,7 +33,6 @@ interface IUser {
 }
 
 const TeamDetailsForm: React.FC<IProps> = ({ isOpen, onClose, minTeamSize, maxTeamSize, teamName = '', teamMembers = [], setTeam }) => {
-  console.log('TeamDetailsForm', teamName, teamMembers);
   const { user } = useAppSelector((state) => state.auth);
   const [name, setName] = useState('');
   const [members, setMembers] = useState<IUser[]>([]);
@@ -260,13 +259,8 @@ const TeamDetailsForm: React.FC<IProps> = ({ isOpen, onClose, minTeamSize, maxTe
               setTeam([name, members]);
               handleClose();
             }}
-            // onPress={async () => {
-            //   const isFreeEvent = event.eventPrice === 0 || event.eventPriceForKGEC === 0;
-            //   if (isFreeEvent) await handleBookTicket();
-            //   else await handleTicketPurchase();
-            // }}
           >
-            Create Team
+            {teamName ? 'Update Team' : 'Create Team'}
           </Button>
         </ModalFooter>
       </ModalContent>

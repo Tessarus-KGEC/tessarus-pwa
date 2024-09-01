@@ -42,8 +42,14 @@ export interface CreateEventArgs {
 
 export interface BookTicketArgs {
   eventId: string;
+  orderId?: string;
   team: {
     name: string;
     members: string[];
   };
+}
+
+export interface CreatePaymentOrderArgs {
+  orderType: string;
+  amount: number;
 }
