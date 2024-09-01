@@ -9,6 +9,7 @@ import Events from './pages/Events/Events';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
 import Otp from './pages/Otp';
+import RegisteredEvents from './pages/RegisteredEvents/RegisteredEvents';
 import Signup from './pages/Signup';
 import Transactions from './pages/Transactions/Transactions';
 import UserManagement from './pages/UserManagement';
@@ -56,7 +57,7 @@ const appRouter = createBrowserRouter([
               },
               {
                 path: Route.REGISTERED_EVENTS,
-                element: <Events registeredEventsOnly={true} />,
+                element: <RegisteredEvents />,
               },
             ],
           },
