@@ -132,15 +132,15 @@ const Events: FunctionComponent = () => {
       </div>
       {/* {loading && <p>Loading...</p>} */}
       <ScrollShadow size={20}>
-        <ul ref={eventListRef} className="grid flex-1 grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4 overflow-y-auto !px-4 !pb-4">
+        <ul ref={eventListRef} className="relative grid flex-1 grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4 overflow-y-auto !px-4 !pb-12">
           {events.length > 0 &&
             events.map((event) => (
               <li ref={events.length === events.indexOf(event) + 1 ? lastEventCardRef : null} key={event._id} className="">
                 <EventCard event={event} isFromKGEC={user?.isFromKGEC} />
               </li>
             ))}
-          <li className="flex justify-center py-3 text-center text-default-500">
-            <p className="flex items-center space-x-4 px-2 py-4">
+          <li className="absolute bottom-0 left-0 right-0 flex justify-center py-2 text-center text-default-500">
+            <p className="flex items-center space-x-4 px-2">
               {isFetchingMoreEvents ? (
                 <>
                   <Spinner width="25" />
