@@ -47,7 +47,7 @@ const Event: React.FC = () => {
   );
   const [bookTicket, { isLoading: isBookTicketLoading }] = useBookTicketMutation();
 
-  const { handlePaymentGatewayRender } = useRazorpayPG();
+  const { handlePaymentGatewayRender, isPaymentLoading } = useRazorpayPG();
 
   useEffect(() => {
     if (eventTicket?.status === 200) {
@@ -275,7 +275,7 @@ const Event: React.FC = () => {
 
           {isTeamCreated && !bookedTicketId ? (
             <Button
-              isLoading={isBookTicketLoading}
+              isLoading={isBookTicketLoading || isPaymentLoading}
               color="primary"
               className="w-full max-w-[300px] flex-1 text-center"
               onPress={async () => {
