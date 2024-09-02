@@ -1,5 +1,5 @@
+import useMeilisearch from '@/hooks/useMeilisearch';
 import { Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Tab, Tabs, User } from '@nextui-org/react';
-import { MeiliSearch } from 'meilisearch';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { IoAdd, IoTrash } from 'react-icons/io5';
@@ -14,11 +14,6 @@ interface IProps {
   teamMembers: IUser[];
   setTeam: ([teamName, members]: [string, IUser[]]) => void;
 }
-
-const meiliClient = new MeiliSearch({
-  host: 'http://localhost:7700',
-  apiKey: 'cb471cae642d64887c8bd8ad5ce37f58',
-});
 
 interface IUser {
   _id: string;
@@ -40,6 +35,8 @@ const TeamDetailsForm: React.FC<IProps> = ({ isOpen, onClose, minTeamSize, maxTe
 
   const [searchResults, setSearchResults] = useState<IUser[]>([]);
   //   const [bookTicket, { isLoading }] = useBookTicketMutation();
+
+  const meiliClient = useMeilisearch();
 
   const searchMembers = async (query: string) => {
     const results = await meiliClient.index('users').search(query, {
