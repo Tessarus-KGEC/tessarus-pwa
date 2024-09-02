@@ -3,6 +3,8 @@ import { setupListeners } from '@reduxjs/toolkit/query';
 import { authApi } from './api/auth.slice';
 
 import { eventApi } from './api/event.slice';
+import { paymentApi } from './api/payment.slice';
+import { ticketApi } from './api/ticket.slice';
 import { userApi } from './api/user.slice';
 import authReducer from './reducers/auth.reducer';
 import routeReducer from './reducers/route.reducer';
@@ -15,9 +17,17 @@ export const store = configureStore({
     [authApi.reducerPath]: authApi.reducer,
     [userApi.reducerPath]: userApi.reducer,
     [eventApi.reducerPath]: eventApi.reducer,
+    [ticketApi.reducerPath]: ticketApi.reducer,
+    [paymentApi.reducerPath]: paymentApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({ serializableCheck: false }).concat(authApi.middleware, userApi.middleware, eventApi.middleware),
+    getDefaultMiddleware({ serializableCheck: false }).concat(
+      authApi.middleware,
+      userApi.middleware,
+      eventApi.middleware,
+      ticketApi.middleware,
+      paymentApi.middleware,
+    ),
 });
 
 setupListeners(store.dispatch);

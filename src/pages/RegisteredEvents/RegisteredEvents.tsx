@@ -3,22 +3,18 @@ import { ScrollShadow } from '@nextui-org/react';
 import axios, { AxiosError } from 'axios';
 import { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import { IoAdd, IoFilter } from 'react-icons/io5';
+import { IoFilter } from 'react-icons/io5';
 import SearchBar from '../../components/SearchBar';
 import Sheet from '../../components/Sheet';
 import Spinner from '../../components/Spinner';
-import { PERMISSIONS } from '../../constants';
-import useMediaQuery from '../../hooks/useMedia';
 import { useAppSelector } from '../../redux';
 import { IEvent } from '../../types/response.type';
-import CreateEventForm from './components/CreateEventForm';
-import EventCard from './components/EventCard';
-import FilterForm from './components/FilterForm';
+import EventCard from '../Events/components/EventCard';
+import FilterForm from '../Events/components/FilterForm';
 
-const Events: FunctionComponent = () => {
-  const { user } = useAppSelector((state) => state.auth);
+const RegisteredEvents: FunctionComponent = () => {
+  const { user, authToken } = useAppSelector((state) => state.auth);
   const [isFilterOpened, setIsFilterOpened] = useState(false);
-  const [isCreateEventFormOpen, setIsCreateEventFormOpen] = useState(false);
   const [events, setEvents] = useState<IEvent[]>([]);
   const [page, setPage] = useState(1);
   const [isFetchingMoreEvents, setFetchingMoreEvents] = useState(false);
@@ -37,6 +33,8 @@ const Events: FunctionComponent = () => {
         query.append('limit', limit.toString());
       }
 
+      if (!authToken) return null;
+
       const resp = await axios.get<{
         data: {
           events: IEvent[];
@@ -45,10 +43,11 @@ const Events: FunctionComponent = () => {
           currentPage: number;
           hasMore: boolean;
         };
-      }>(`${import.meta.env.VITE_API_URL}/events?${query.toString()}`, {
+      }>(`${import.meta.env.VITE_API_URL}/events/registered?${query.toString()}`, {
         headers: {
           'ngrok-skip-browser-warning': 'true',
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${authToken}`,
         },
       });
 
@@ -105,29 +104,15 @@ const Events: FunctionComponent = () => {
     [isFetchingMoreEvents, hasMore],
   );
 
-  const isMobile = useMediaQuery('(max-width: 768px)');
   return (
     <div ref={eventPageRef} className="flex h-full flex-1 flex-grow-0 flex-col gap-4">
       <div className="space-y-4 px-4">
-        <h1 className="text-2xl">Events</h1>
+        <h1 className="text-2xl">Registered events</h1>
         <div className="flex gap-4">
-          <SearchBar placeholder={`Search your favorite event...`} />
+          <SearchBar placeholder={`Search your registered event...`} />
           <Button isIconOnly color="default" aria-label="Like" onClick={() => setIsFilterOpened(!isFilterOpened)}>
             <IoFilter size={24} />
           </Button>
-          {!user || !user.isFromKGEC || !user.permissions.includes(PERMISSIONS.CREATE_EVENT) ? null : (
-            <Button
-              isIconOnly={isMobile}
-              color="primary"
-              className={`space-x-2 ${!isMobile ? '!px-6' : ''}`}
-              onClick={() => setIsCreateEventFormOpen(true)}
-            >
-              <span>
-                <IoAdd size={24} />
-              </span>
-              {!isMobile ? 'Add Event' : null}
-            </Button>
-          )}
         </div>
       </div>
       {/* {loading && <p>Loading...</p>} */}
@@ -160,16 +145,8 @@ const Events: FunctionComponent = () => {
       <Sheet open={isFilterOpened} onClose={() => setIsFilterOpened(false)}>
         <FilterForm />
       </Sheet>
-
-      {/* Create event form */}
-      <CreateEventForm
-        open={isCreateEventFormOpen}
-        onClose={() => {
-          setIsCreateEventFormOpen(false);
-        }}
-      />
     </div>
   );
 };
 
-export default Events;
+export default RegisteredEvents;

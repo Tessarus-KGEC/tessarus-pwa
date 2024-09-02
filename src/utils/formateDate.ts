@@ -1,8 +1,18 @@
-export function formateDate(dateString: string) {
+export function formateDate(
+  dateString: string,
+  options?: {
+    weekday?: 'long' | 'short' | 'narrow';
+    removeDay?: boolean;
+  },
+) {
   const date = new Date(dateString);
 
   const formatter = new Intl.DateTimeFormat('en-IN', {
-    weekday: 'long', // "Mon"
+    ...(options?.removeDay
+      ? {}
+      : {
+          weekday: options?.weekday || 'long', // "Mon"
+        }),
     day: '2-digit', // "02"
     month: 'short', // "Jan"
     // year: 'numeric', // "2024"

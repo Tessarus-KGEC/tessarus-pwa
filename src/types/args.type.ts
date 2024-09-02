@@ -39,3 +39,17 @@ export interface CreateEventArgs {
     image?: string;
   }[];
 }
+
+export interface BookTicketArgs {
+  eventId: string;
+  orderId?: string;
+  team: {
+    name: string;
+    members: string[];
+  };
+}
+
+export interface CreatePaymentOrderArgs {
+  orderType: string;
+  amount: number;
+}

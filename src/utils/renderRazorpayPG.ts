@@ -27,11 +27,13 @@ export async function renderRazorpayPG({
   orderType,
   description,
   token,
+  paymentSuccessCallback,
 }: {
   amount: number;
   orderType: 'ticket' | 'wallet';
   description: string;
   token: string;
+  paymentSuccessCallback: () => Promise<void>;
 }) {
   const res = await loadScript('https://checkout.razorpay.com/v1/checkout.js');
 
@@ -69,6 +71,9 @@ export async function renderRazorpayPG({
       order_id: orderData.data.data.orderId,
       theme: {
         color: '#554ccc',
+      },
+      handler: async function (response: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string }) {
+        if (response.razorpay_payment_id) await paymentSuccessCallback();
       },
       //   prefill: {
       //     name: 'Gaurav Kumar',
