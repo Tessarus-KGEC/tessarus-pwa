@@ -125,7 +125,7 @@ const Event: React.FC = () => {
     return <div>Invalid Event</div>;
   }
   return (
-    <section className="flex flex-col gap-4 px-4 pb-6 sm:flex-row md:gap-6 md:px-6 md:pb-8">
+    <section className="flex flex-col gap-4 overflow-x-hidden px-4 pb-6 sm:flex-row md:gap-6 md:px-6 md:pb-8">
       <article className="space-y-6 sm:flex-[2_2_0%]">
         <div>
           <ImageComponent alt={eventData.data.title} src={eventData.data.eventCoverImage} scaleRatio="md" />
