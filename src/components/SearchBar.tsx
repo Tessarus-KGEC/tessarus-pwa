@@ -5,11 +5,13 @@ import { IoSearchOutline } from 'react-icons/io5';
 const SearchBar: React.FC<{
   placeholder?: string;
   value?: string;
+  className?: string;
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onClear?: () => void;
-}> = ({ placeholder = 'Type to search...', value, onChange, onClear }) => {
+}> = ({ placeholder = 'Type to search...', value, onChange, onClear, className }) => {
   return (
     <Input
+      className={className}
       placeholder={placeholder}
       startContent={<IoSearchOutline size={22} />}
       value={value}

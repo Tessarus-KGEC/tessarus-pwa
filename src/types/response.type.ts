@@ -137,3 +137,11 @@ export interface CreatePaymentOrderResponse {
   razorpayOrderId: string;
   amount: number;
 }
+
+export interface GetAllUAMUsersResponse {
+  users: Pick<
+    User,
+    '_id' | 'name' | 'email' | 'phone' | 'college' | 'espektroId' | 'isFromKGEC' | 'isVolunteer' | 'profileImageUrl' | 'permissions'
+  >[];
+  total: number;
+}
