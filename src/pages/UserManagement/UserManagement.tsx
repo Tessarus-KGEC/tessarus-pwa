@@ -29,8 +29,8 @@ declare module '@tanstack/react-table' {
 
 const UserManagement: FunctionComponent = () => {
   const { user } = useAppSelector((state) => state.auth);
-  const isVisibleForScreen = useMediaQuery('(min-width: 1024px)');
   const isUserAllowedToView = user?.permissions.includes(PERMISSIONS.ADMIN_READONLY);
+  const isVisibleForScreen = useMediaQuery('(min-width: 768px)');
   const allowedPermissionsForSaveChanges = [
     PERMISSIONS.ASSIGN_ROLE,
     PERMISSIONS.REVOKE_ROLE,
@@ -132,6 +132,7 @@ const UserManagement: FunctionComponent = () => {
           className: 'text-center',
         },
       }),
+
       columnHelper.display({
         id: 'action',
         header: 'Role',
@@ -247,14 +248,9 @@ const UserManagement: FunctionComponent = () => {
     onColumnPinningChange: setColumnPinning,
     columnResizeMode: 'onChange',
   });
+  if (uamUsers?.status !== 200) return null;
 
-  if (!isVisibleForScreen) {
-    return (
-      <div className="px-4">
-        <Alrert title="Not available" message="This feature is not available for this screen size" type="warning" />
-      </div>
-    );
-  } else if (!isUserAllowedToView) {
+  if (!isUserAllowedToView) {
     return (
       <div className="px-4">
         <Alrert title="Permission Denied" message="You do not have permission to view this page." type="danger" />
@@ -262,95 +258,98 @@ const UserManagement: FunctionComponent = () => {
     );
   }
 
-  if (uamUsers?.status !== 200) return null;
-
   return (
-    <section className="flex h-full flex-col space-y-4 px-4 pb-6">
-      <h1 className="text-2xl">User Management</h1>
-      <div className="flex">
-        <div className="flex flex-1 gap-4">
-          <SearchBar placeholder={`Search your favorite event...`} className="max-w-[450px]" onChange={(e) => setSearchQuery(e.target.value)} />
-          <Button
-            color="primary"
-            isDisabled={
-              !user || !user.isFromKGEC || !allowedPermissionsForSaveChanges.some((perm) => user.permissions.includes(perm)) || !accessChanges
-            }
-            onClick={() => {
-              console.log('Save changes');
-              setIsConfirmModalVisibel(true);
-            }}
-          >
-            Save Changes
-          </Button>
-        </div>
-        <Pagination
-          isCompact
-          showControls
-          total={Math.ceil(uamUsers.data.total / limit)}
-          initialPage={page}
-          size="lg"
-          className="ml-auto"
-          onChange={(page) => setPage(page)}
-        />
+    <>
+      <div className="px-4 md:hidden">
+        <Alrert title="Not available" message="This feature is not available for this screen size (over 768px)" type="warning" />
       </div>
-      <ScrollShadow>
-        <div className="flex-1 overflow-auto rounded-2xl bg-default-50">
-          <table className="w-full">
-            <thead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id} className="border-b border-default-200">
-                  {headerGroup.headers.map((header) => (
-                    <th key={header.id} className="border-red-500 py-4">
-                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            <tbody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row, index) => (
-                  <>
-                    <tr
-                      key={row.id}
-                      data-state={row.getIsSelected() && 'selected'}
-                      className={`${index === table.getRowModel().rows.length - 1 ? '' : 'border-b'} border-default-100`}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <td key={cell.id} className={`py-2 ${cell.column.columnDef.meta?.className ?? ''}`} width={cell.column.getSize()}>
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </td>
-                      ))}
-                    </tr>
-
-                    {row.getIsExpanded() && expandedRowState && (
-                      <tr>
-                        <td colSpan={row.getVisibleCells().length}>{expandedRowState[row.id].content}</td>
-                      </tr>
-                    )}
-                  </>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={columns.length} className="h-24 text-center">
-                    No results.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+      <section className="hidden h-full flex-col space-y-4 px-4 pb-6 md:flex">
+        <h1 className="text-2xl">User Management</h1>
+        <div className="flex">
+          <div className="flex flex-1 gap-4">
+            <SearchBar placeholder={`Search your favorite event...`} className="max-w-[450px]" onChange={(e) => setSearchQuery(e.target.value)} />
+            <Button
+              color="primary"
+              isDisabled={
+                !user || !user.isFromKGEC || !allowedPermissionsForSaveChanges.some((perm) => user.permissions.includes(perm)) || !accessChanges
+              }
+              onClick={() => {
+                console.log('Save changes');
+                setIsConfirmModalVisibel(true);
+              }}
+            >
+              Save Changes
+            </Button>
+          </div>
+          <Pagination
+            isCompact
+            showControls
+            total={Math.ceil(uamUsers.data.total / limit)}
+            initialPage={page}
+            size="lg"
+            className="ml-auto"
+            onChange={(page) => setPage(page)}
+          />
         </div>
-      </ScrollShadow>
+        <ScrollShadow>
+          <div className="flex-1 overflow-auto rounded-2xl bg-default-50">
+            <table className="w-full">
+              <thead>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id} className="border-b border-default-200">
+                    {headerGroup.headers.map((header) => (
+                      <th key={header.id} className={`border-red-500 py-4`}>
+                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+              <tbody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row, index) => (
+                    <>
+                      <tr
+                        key={row.id}
+                        data-state={row.getIsSelected() && 'selected'}
+                        className={`${index === table.getRowModel().rows.length - 1 ? '' : 'border-b'} border-default-100`}
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <td key={cell.id} className={`py-2 ${cell.column.columnDef.meta?.className ?? ''}`} width={cell.column.getSize()}>
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </td>
+                        ))}
+                      </tr>
 
-      <ChangeConfirmModal
-        isOpen={isConfirmModalVisibel}
-        onClose={(action) => {
-          if (action === 'clear') setAccessChanges({});
-          setIsConfirmModalVisibel(false);
-        }}
-        accessChanges={accessChanges ?? {}}
-      />
-    </section>
+                      {row.getIsExpanded() && expandedRowState && (
+                        <tr>
+                          <td colSpan={row.getVisibleCells().length}>{expandedRowState[row.id].content}</td>
+                        </tr>
+                      )}
+                    </>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={columns.length} className="h-24 text-center">
+                      No results.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </ScrollShadow>
+
+        <ChangeConfirmModal
+          isOpen={isConfirmModalVisibel}
+          onClose={(action) => {
+            if (action === 'clear') setAccessChanges({});
+            setIsConfirmModalVisibel(false);
+          }}
+          accessChanges={accessChanges ?? {}}
+        />
+      </section>
+    </>
   );
 };
 export default UserManagement;
