@@ -74,8 +74,19 @@ const UserManagement: FunctionComponent = () => {
       }
     >
   >();
+  const [actualPermissionsForChangedUsers, setActualPermissionsForChangedUsers] = useState<Record<string, string[]>>();
 
   const [isConfirmModalVisibel, setIsConfirmModalVisibel] = useState(false);
+
+  const isRoleModificationAllowed = useMemo(() => {
+    if (!user) return false;
+    return user.permissions.includes(PERMISSIONS.ASSIGN_ROLE) || user.permissions.includes(PERMISSIONS.REVOKE_ROLE);
+  }, [user]);
+
+  const isVolunteerModificationAllowed = useMemo(() => {
+    if (!user) return false;
+    return user.permissions.includes(PERMISSIONS.ASSIGN_VOLUNTEER) || user.permissions.includes(PERMISSIONS.REVOKE_VOLUNTEER);
+  }, [user]);
 
   const tableData = useMemo(() => {
     if (uamUsers?.status === 200) return uamUsers.data.users.filter((uamUser) => uamUser._id !== user?._id);
@@ -118,9 +129,10 @@ const UserManagement: FunctionComponent = () => {
             name={row.original.name}
             description={row.original.phone}
             avatarProps={{
-              classNames: {
-                base: 'bg-gradient-to-br from-indigo-500 to-pink-500',
-              },
+              src: row.original.profileImageUrl,
+              // classNames: {
+              //   base: 'bg-gradient-to-br from-indigo-500 to-pink-500',
+              // },
             }}
           />
         ),
@@ -146,7 +158,7 @@ const UserManagement: FunctionComponent = () => {
                   key: perm,
                   permission: perm,
                 }))}
-              isDisabled={!row.original.isFromKGEC}
+              isDisabled={!row.original.isFromKGEC || !isRoleModificationAllowed}
               variant="bordered"
               isMultiline={true}
               selectionMode="multiple"
@@ -200,7 +212,7 @@ const UserManagement: FunctionComponent = () => {
           <div className="flex items-center justify-center hover:cursor-pointer">
             <Switch
               size="md"
-              isDisabled={!row.original.isFromKGEC}
+              isDisabled={!row.original.isFromKGEC || !isVolunteerModificationAllowed}
               defaultSelected={
                 accessChanges && accessChanges[row.original._id] ? accessChanges[row.original._id].isVolunteer : row.original.isVolunteer
               }
@@ -275,6 +287,19 @@ const UserManagement: FunctionComponent = () => {
               }
               onClick={() => {
                 console.log('Save changes');
+                if (!accessChanges) return;
+                const actualPermissions = Object.entries(accessChanges).reduce(
+                  (acc, [key]) => {
+                    const user = tableData.find((u) => u._id === key);
+                    if (!user) return acc;
+                    return {
+                      ...acc,
+                      [key]: user.permissions,
+                    };
+                  },
+                  {} as Record<string, string[]>,
+                );
+                setActualPermissionsForChangedUsers(actualPermissions);
                 setIsConfirmModalVisibel(true);
               }}
             >
@@ -346,6 +371,7 @@ const UserManagement: FunctionComponent = () => {
             if (action === 'clear') setAccessChanges({});
             setIsConfirmModalVisibel(false);
           }}
+          actualPermissions={actualPermissionsForChangedUsers ?? {}}
           accessChanges={accessChanges ?? {}}
         />
       </section>
