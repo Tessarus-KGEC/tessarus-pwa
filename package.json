@@ -29,6 +29,7 @@
     "@nextui-org/tabs": "^2.0.32",
     "@nextui-org/theme": "^2.2.6",
     "@reduxjs/toolkit": "^2.2.6",
+    "@tanstack/react-table": "^8.20.5",
     "@uiw/react-md-editor": "^4.0.4",
     "axios": "^1.7.4",
     "framer-motion": "^11.2.13",

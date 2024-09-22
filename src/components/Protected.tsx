@@ -5,6 +5,7 @@ import { logout, setCurrentUser, setIsLoggedIn, setToken } from '@/redux/reducer
 import { getAPIErrorMessage } from '@/utils/api.helper';
 import { getLocalStorageItem } from '@/utils/localStorage.helper';
 
+import { Routes } from '@/types/route';
 import { FunctionComponent, PropsWithChildren, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -14,7 +15,7 @@ const ProtectedLayout: FunctionComponent<PropsWithChildren> = ({ children }) => 
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const location = useLocation();
-  const { authToken } = useAppSelector((state) => state.auth);
+  const { authToken, user } = useAppSelector((state) => state.auth);
 
   const {
     data: response,
@@ -41,6 +42,20 @@ const ProtectedLayout: FunctionComponent<PropsWithChildren> = ({ children }) => 
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
+
+  // permissions check
+  useEffect(() => {
+    if (!user) return;
+    const matchedRoute = Object.entries(Routes).find(([, val]) => location.pathname.includes(val.slug));
+    if (!matchedRoute) return;
+    const routePermissions = matchedRoute[1].permissions;
+    if (routePermissions.length === 0) return;
+    const hasPermission = routePermissions.every((perm) => user.permissions.includes(perm));
+    if (!hasPermission) {
+      navigate(RoutePath.events());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname, user]);
 
   useEffect(() => {
     if (isError) {

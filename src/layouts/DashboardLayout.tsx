@@ -4,7 +4,7 @@ import { RoutePath } from '@/constants/route';
 import { useAppDispatch, useAppSelector } from '@/redux';
 import { logout } from '@/redux/reducers/auth.reducer';
 import RouteWrapper from '@/redux/RouteWrapper';
-import { Route } from '@/types/route';
+import { Route, Routes } from '@/types/route';
 import { useGSAP } from '@gsap/react';
 import { Avatar } from '@nextui-org/avatar';
 import { Button } from '@nextui-org/button';
@@ -25,62 +25,78 @@ import { MdInstallMobile, MdOutlineAdminPanelSettings, MdOutlineEvent } from 're
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 gsap.registerPlugin(useGSAP);
-const dashboardPath = '/dashboard';
+
 const navlinks: {
   title: string;
   route: string;
   status: 'active' | 'inactive';
   slug: string;
   icon: JSX.Element;
+  permissions: string[];
+  protected: boolean;
 }[] = [
   {
     title: 'Events',
     route: Route.EVENTS,
     status: 'active',
-    slug: `${dashboardPath}/${Route.EVENTS}`,
+    slug: Routes[Route.EVENTS].slug,
     icon: <MdOutlineEvent size={20} />,
+    permissions: Routes[Route.EVENTS].permissions,
+    protected: false,
   },
   {
     title: 'Check in',
     route: Route.CHECKIN,
     status: 'active',
-    slug: `${dashboardPath}/${Route.CHECKIN}`,
+    slug: Routes[Route.CHECKIN].slug,
     icon: <IoScanOutline size={20} />,
+    permissions: Routes[Route.CHECKIN].permissions,
+    protected: true,
   },
   {
     title: 'Registered events',
     route: `${Route.EVENTS}/${Route.REGISTERED_EVENTS}`,
     status: 'active',
-    slug: `${dashboardPath}/${Route.EVENTS}/${Route.REGISTERED_EVENTS}`,
+    slug: Routes[Route.REGISTERED_EVENTS].slug,
     icon: <IoTicketOutline size={20} />,
+    permissions: Routes[Route.REGISTERED_EVENTS].permissions,
+    protected: true,
   },
   {
     title: 'Wallet',
     route: Route.WALLET,
     status: 'active',
-    slug: `${dashboardPath}/${Route.WALLET}`,
+    slug: Routes[Route.WALLET].slug,
     icon: <IoWalletOutline size={20} />,
+    permissions: Routes[Route.WALLET].permissions,
+    protected: true,
   },
   {
     title: 'Analytics',
     route: Route.ANALYTICS,
     status: 'active',
-    slug: `${dashboardPath}/${Route.ANALYTICS}`,
+    slug: Routes[Route.ANALYTICS].slug,
     icon: <IoAnalyticsOutline size={20} />,
+    permissions: Routes[Route.ANALYTICS].permissions,
+    protected: true,
   },
   {
     title: 'Transactions',
     route: Route.TRANSACTIONS,
     status: 'active',
-    slug: `${dashboardPath}/${Route.TRANSACTIONS}`,
+    slug: Routes[Route.TRANSACTIONS].slug,
     icon: <IoDocumentTextOutline size={20} />,
+    permissions: Routes[Route.TRANSACTIONS].permissions,
+    protected: true,
   },
   {
     title: 'User management',
     route: Route.USER_MANAGEMENT,
     status: 'active',
-    slug: `${dashboardPath}/${Route.USER_MANAGEMENT}`,
+    slug: Routes[Route.USER_MANAGEMENT].slug,
     icon: <MdOutlineAdminPanelSettings size={20} />,
+    permissions: Routes[Route.USER_MANAGEMENT].permissions,
+    protected: true,
   },
 ];
 
@@ -122,6 +138,7 @@ const Sidebar: FunctionComponent<{
   renderCustomPWAInstallPrompt?: Event | null;
 }> = ({ handleClose, classname, hideClose, renderCustomPWAInstallPrompt }) => {
   const { activeRoute } = useAppSelector((state) => state.route);
+  const { user } = useAppSelector((state) => state.auth);
 
   const isActiveRoute = useCallback((slug: string) => activeRoute === slug, [activeRoute]);
 
@@ -142,7 +159,9 @@ const Sidebar: FunctionComponent<{
       <div className="px-4">
         <ul className="flex flex-col gap-2">
           {navlinks.map((link) => {
+            if (link.protected && !user) return null;
             if (link.status === 'inactive') return null;
+            if (user && !link.permissions.every((permission) => user.permissions.includes(permission))) return null;
             return (
               <Link key={link.route} to={`/dashboard/${link.route}`}>
                 <div

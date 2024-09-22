@@ -53,3 +53,17 @@ export interface CreatePaymentOrderArgs {
   orderType: string;
   amount: number;
 }
+
+export interface GetAllUAMUsersArgs {
+  page?: number;
+  limit?: number;
+  search?: string;
+  fromKGEC?: boolean;
+  permissions?: string[];
+}
+
+export interface UpdateUAMUserArgs {
+  userId: string;
+  isVolunteer: boolean;
+  permissions: string[];
+}

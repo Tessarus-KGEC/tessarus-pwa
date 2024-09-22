@@ -12,7 +12,7 @@ import Otp from './pages/Otp';
 import RegisteredEvents from './pages/RegisteredEvents/RegisteredEvents';
 import Signup from './pages/Signup';
 import Transactions from './pages/Transactions/Transactions';
-import UserManagement from './pages/UserManagement';
+import UserManagement from './pages/UserManagement/UserManagement';
 import Wallet from './pages/Wallet';
 import { Route } from './types/route';
 

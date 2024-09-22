@@ -6,6 +6,7 @@ import { eventApi } from './api/event.slice';
 import { paymentApi } from './api/payment.slice';
 import { ticketApi } from './api/ticket.slice';
 import { userApi } from './api/user.slice';
+import { uamApi } from './api/userManagement.slice';
 import authReducer from './reducers/auth.reducer';
 import routeReducer from './reducers/route.reducer';
 
@@ -19,6 +20,7 @@ export const store = configureStore({
     [eventApi.reducerPath]: eventApi.reducer,
     [ticketApi.reducerPath]: ticketApi.reducer,
     [paymentApi.reducerPath]: paymentApi.reducer,
+    [uamApi.reducerPath]: uamApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({ serializableCheck: false }).concat(
@@ -27,6 +29,7 @@ export const store = configureStore({
       eventApi.middleware,
       ticketApi.middleware,
       paymentApi.middleware,
+      uamApi.middleware,
     ),
 });
 

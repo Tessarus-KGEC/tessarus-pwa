@@ -67,6 +67,11 @@ export const PERMISSIONS = {
   ASSIGN_VOLUNTEER: 'assign:volunteer',
   // revoke volunteer from an event
   REVOKE_VOLUNTEER: 'revoke:volunteer',
+
+  // handling visibility permissions
+  ADMIN_READONLY: 'admin:readonly',
+  VOLUNTEER_READONLY: 'volunteer:readonly',
+  USER_READONLY: 'user:readonly',
 } as const;
 
 export const FallbacKImage = 'https://via.placeholder.com/300x200';
