@@ -1,5 +1,7 @@
 import { Button, Chip, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, ScrollShadow } from '@nextui-org/react';
 import React, { useCallback } from 'react';
+import toast from 'react-hot-toast';
+import { useUpdateUAMUserMutation } from '../../../redux/api/userManagement.slice';
 
 const ChangeConfirmModal: React.FC<{
   isOpen: boolean;
@@ -14,6 +16,7 @@ const ChangeConfirmModal: React.FC<{
     }
   >;
 }> = ({ isOpen, onClose, accessChanges, actualPermissions }) => {
+  const [updateUAMHanlder, { isLoading }] = useUpdateUAMUserMutation();
   const getAllPermissions = useCallback(
     (key: string) => {
       if (!isOpen) return [];
@@ -53,6 +56,32 @@ const ChangeConfirmModal: React.FC<{
     },
     [getAllPermissions, accessChanges, actualPermissions, isOpen],
   );
+
+  async function handleSaveChanges() {
+    const body = Object.entries(accessChanges).map(([key, value]) => {
+      return {
+        userId: key,
+        isVolunteer: value.isVolunteer ?? false,
+        permissions: value.roles ?? [],
+      };
+    });
+    console.log(body);
+    try {
+      const response = await updateUAMHanlder(body).unwrap();
+      if (response) {
+        toast.success('Changes saved successfully');
+        onClose?.();
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      if ('data' in error && 'message' in error.data) {
+        toast.error(error.data.message);
+      } else {
+        toast.error('Failed to save changes');
+      }
+    }
+  }
+
   return (
     <Modal
       size={'lg'}
@@ -122,7 +151,7 @@ const ChangeConfirmModal: React.FC<{
           <Button color="danger" variant="light" onPress={() => onClose?.('clear')}>
             Clear changes
           </Button>
-          <Button color="primary" onPress={() => onClose?.()}>
+          <Button isLoading={isLoading} color="primary" onPress={handleSaveChanges}>
             Save changes
           </Button>
         </ModalFooter>

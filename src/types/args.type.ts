@@ -61,3 +61,9 @@ export interface GetAllUAMUsersArgs {
   fromKGEC?: boolean;
   permissions?: string[];
 }
+
+export interface UpdateUAMUserArgs {
+  userId: string;
+  isVolunteer: boolean;
+  permissions: string[];
+}

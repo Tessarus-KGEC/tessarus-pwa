@@ -1,5 +1,5 @@
 import { HttpMethod, Response } from '@/types/api.type';
-import { GetAllUAMUsersArgs } from '@/types/args.type';
+import { GetAllUAMUsersArgs, UpdateUAMUserArgs } from '@/types/args.type';
 import { GetAllUAMUsersResponse } from '@/types/response.type';
 import { RootState } from '@/types/store.type';
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
@@ -44,7 +44,16 @@ export const uamApi = createApi({
         };
       },
     }),
+    updateUAMUser: builder.mutation<Response<unknown>, UpdateUAMUserArgs[]>({
+      query: (args) => ({
+        url: `/users`,
+        method: HttpMethod.PATCH,
+        body: {
+          users: args,
+        },
+      }),
+    }),
   }),
 });
 
-export const { useGetUAMUsersQuery } = uamApi;
+export const { useGetUAMUsersQuery, useUpdateUAMUserMutation } = uamApi;
