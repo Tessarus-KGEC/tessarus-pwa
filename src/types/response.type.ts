@@ -136,6 +136,7 @@ export interface CreatePaymentOrderResponse {
   };
   razorpayOrderId: string;
   amount: number;
+  transaction: string;
 }
 
 export interface GetAllUAMUsersResponse {
@@ -144,4 +145,27 @@ export interface GetAllUAMUsersResponse {
     '_id' | 'name' | 'email' | 'phone' | 'college' | 'espektroId' | 'isFromKGEC' | 'isVolunteer' | 'profileImageUrl' | 'permissions'
   >[];
   total: number;
+}
+
+export interface GetWalletBalanceResponse {
+  wallet: number;
+  _id: string;
+}
+export interface AddAmountArgs {
+  amount: number;
+  transactionId: string;
+}
+export interface AddAmountResponse {
+  _id: string;
+  amount: number;
+}
+
+export interface DeductWalletAmountArgs {
+  amount: number;
+  eventId?: string;
+}
+export interface DeductWalletAmountResponse {
+  _id: string;
+  amount: number;
+  transaction: string;
 }

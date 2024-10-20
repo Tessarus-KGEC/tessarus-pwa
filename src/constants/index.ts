@@ -74,4 +74,11 @@ export const PERMISSIONS = {
   USER_READONLY: 'user:readonly',
 } as const;
 
+export const PaymentMethodMap = {
+  WALLET: 'wallet',
+  RAZORPAY: 'razorpay',
+} as const;
+
 export const FallbacKImage = 'https://via.placeholder.com/300x200';
+
+export type PaymentMethod = (typeof PaymentMethodMap)[keyof typeof PaymentMethodMap];

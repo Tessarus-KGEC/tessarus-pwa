@@ -42,7 +42,7 @@ export interface CreateEventArgs {
 
 export interface BookTicketArgs {
   eventId: string;
-  orderId?: string;
+  transactionId?: string;
   team: {
     name: string;
     members: string[];
@@ -50,8 +50,9 @@ export interface BookTicketArgs {
 }
 
 export interface CreatePaymentOrderArgs {
-  orderType: string;
+  orderType: 'ticket' | 'wallet';
   amount: number;
+  eventId?: string;
 }
 
 export interface GetAllUAMUsersArgs {

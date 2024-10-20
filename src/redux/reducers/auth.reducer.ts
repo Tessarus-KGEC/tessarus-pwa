@@ -9,6 +9,7 @@ interface AuthState {
   authToken: string | null;
   user: User | null;
   email: string;
+  walletBalance: number;
 }
 
 const initialState = {
@@ -16,6 +17,7 @@ const initialState = {
   authToken: null,
   user: null,
   email: '',
+  walletBalance: 0,
 } satisfies AuthState as AuthState;
 
 const authSlice = createSlice({
@@ -39,6 +41,9 @@ const authSlice = createSlice({
     setCurrentUser(state, action: PayloadAction<User | null>) {
       state.user = action.payload;
     },
+    setCurrentUserWalletBalance(state, action: PayloadAction<number>) {
+      state.walletBalance = action.payload;
+    },
     logout(state) {
       state.isLoggedIn = false;
       state.authToken = null;
@@ -48,7 +53,5 @@ const authSlice = createSlice({
   },
 });
 
-export const {
-  setIsLoggedIn, setToken, setCurrentUser, logout, setUserEmail,
-} = authSlice.actions;
+export const { setIsLoggedIn, setToken, setCurrentUser, logout, setUserEmail, setCurrentUserWalletBalance } = authSlice.actions;
 export default authSlice.reducer;

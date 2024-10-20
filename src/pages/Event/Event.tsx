@@ -1,10 +1,8 @@
-import useRazorpayPG from '@/hooks/useRazorpayPG';
-import { useBookTicketMutation, useGetTicketByEventQuery } from '@/redux/api/ticket.slice';
+import { useGetTicketByEventQuery } from '@/redux/api/ticket.slice';
 import { UserSelfResponse } from '@/types/response.type';
 import { Button, Chip, User } from '@nextui-org/react';
 import MDEditor from '@uiw/react-md-editor';
 import React, { useEffect, useMemo, useState } from 'react';
-import toast from 'react-hot-toast';
 import { IoCalendar, IoLocationSharp, IoTicketOutline } from 'react-icons/io5';
 import { MdOutlineModeEditOutline } from 'react-icons/md';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -15,14 +13,15 @@ import { RoutePath } from '../../constants/route';
 import { useAppSelector } from '../../redux';
 import { useGetEventQuery, useGetEventsRecommendationQuery } from '../../redux/api/event.slice';
 import { formateDate } from '../../utils/formateDate';
+import PaymentSelectionModal from './components/PaymentSelectionModal';
 import TeamDetailsForm from './components/TeamDetailsForm';
 
-interface ITeamMember
+export interface ITeamMember
   extends Pick<UserSelfResponse, '_id' | 'name' | 'email' | 'phone' | 'college' | 'espektroId' | 'isFromKGEC' | 'isVolunteer' | 'profileImageUrl'> {}
 
 const Event: React.FC = () => {
   const navigate = useNavigate();
-  const { user, isLoggedIn } = useAppSelector((state) => state.auth);
+  const { user, isLoggedIn, walletBalance } = useAppSelector((state) => state.auth);
   const { eventId } = useParams<{
     eventId: string;
   }>();
@@ -31,6 +30,7 @@ const Event: React.FC = () => {
   const [teamName, setTeamName] = useState('');
   const [teamMembers, setTeamMembers] = useState<ITeamMember[]>([]);
   const [bookedTicketId, setBookedTicketId] = useState<string>();
+  const [showPaymentMethodSelectionModal, setShowPaymentMethodSelectionModal] = useState(false);
 
   const { data: eventData, isLoading } = useGetEventQuery(
     { eventId: eventId ?? '' },
@@ -45,9 +45,6 @@ const Event: React.FC = () => {
       refetchOnMountOrArgChange: true,
     },
   );
-  const [bookTicket, { isLoading: isBookTicketLoading }] = useBookTicketMutation();
-
-  const { handlePaymentGatewayRender, isPaymentLoading } = useRazorpayPG();
 
   useEffect(() => {
     if (eventTicket?.status === 200) {
@@ -62,58 +59,6 @@ const Event: React.FC = () => {
   }, [eventTicket]);
 
   const isTeamCreated = useMemo(() => teamName && teamMembers.length > 0, [teamName, teamMembers]);
-
-  const handleBookTicket = async (orderId?: string) => {
-    try {
-      if (!eventId) return;
-      const ticketResponse = await bookTicket({
-        eventId,
-        orderId,
-        team: {
-          name: teamName,
-          members: teamMembers.map((mem) => mem._id),
-        },
-      }).unwrap();
-      console.log(ticketResponse);
-      if (ticketResponse.status === 201) {
-        setBookedTicketId(ticketResponse.data._id);
-        toast.success('Ticket booked successfully');
-      }
-      return;
-    } catch (error) {
-      console.error(error);
-      // TODO: if failed to book ticket, we should refund the payment
-      toast.error('Failed to book ticket');
-    }
-  };
-
-  const handleTicketPurchase = async ({
-    isFromKGEC,
-    eventPrice,
-    eventPriceForKGEC,
-    title,
-  }: {
-    isFromKGEC: boolean;
-    eventPrice: number;
-    eventPriceForKGEC: number;
-    title: string;
-  }) => {
-    try {
-      //handle payment
-      await handlePaymentGatewayRender({
-        amount: (isFromKGEC ? eventPriceForKGEC : eventPrice) || eventPrice,
-        description: title,
-        orderType: 'ticket',
-        paymentSuccessCallback: async (orderId) => {
-          await handleBookTicket(orderId);
-        },
-      });
-      return;
-    } catch (error) {
-      toast.error('Ticket purchase failed');
-      return;
-    }
-  };
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -275,19 +220,10 @@ const Event: React.FC = () => {
 
           {isTeamCreated && !bookedTicketId ? (
             <Button
-              isLoading={isBookTicketLoading || isPaymentLoading}
               color="primary"
               className="w-full max-w-[300px] flex-1 text-center"
-              onPress={async () => {
-                const isFreeEvent = eventData.data.eventPrice === 0 || eventData.data.eventPriceForKGEC === 0;
-                if (isFreeEvent) await handleBookTicket();
-                else
-                  await handleTicketPurchase({
-                    isFromKGEC: user?.isFromKGEC ?? false,
-                    eventPrice: eventData.data.eventPrice,
-                    eventPriceForKGEC: eventData.data.eventPriceForKGEC ?? 0,
-                    title: eventData.data.title,
-                  });
+              onPress={() => {
+                setShowPaymentMethodSelectionModal(true);
               }}
             >
               <IoTicketOutline size={20} />
@@ -373,6 +309,30 @@ const Event: React.FC = () => {
           setTeamMembers(teamMembers);
         }}
       />
+
+      {eventId && user ? (
+        <PaymentSelectionModal
+          isOpen={showPaymentMethodSelectionModal}
+          onClose={() => {
+            setShowPaymentMethodSelectionModal(false);
+          }}
+          defaultPaymentMethod={
+            (user && user?.isFromKGEC && eventData.data.eventPriceForKGEC && eventData.data.eventPriceForKGEC <= walletBalance) ||
+            (user && !user?.isFromKGEC && eventData.data.eventPrice && eventData.data.eventPrice <= walletBalance)
+              ? 'wallet'
+              : 'razorpay'
+          }
+          teamName={teamName}
+          teamMembers={teamMembers}
+          eventTitle={eventData.data.title}
+          eventId={eventId}
+          isFreeEvent={eventData.data.eventPrice === 0 || eventData.data.eventPriceForKGEC === 0}
+          eventPrice={user.isFromKGEC ? eventData.data.eventPriceForKGEC || 0 : eventData.data.eventPrice}
+          onTicketBooked={(ticketId) => {
+            setBookedTicketId(ticketId);
+          }}
+        />
+      ) : null}
     </section>
   );
 };
