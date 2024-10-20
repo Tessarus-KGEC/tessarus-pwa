@@ -1,8 +1,4 @@
-import {
-  FunctionComponent,
-  useMemo,
-  useState,
-} from 'react';
+import { FunctionComponent, useMemo, useState } from 'react';
 
 import Alrert from '@/components/Alrert';
 import SearchBar from '@/components/SearchBar';
@@ -86,8 +82,6 @@ const UserManagement: FunctionComponent = () => {
     return [];
   }, [uamUsers, user]);
 
-  if (uamUsers?.status !== 200) return null;
-
   if (!isUserAllowedToView) {
     return (
       <div className="px-4">
@@ -96,11 +90,21 @@ const UserManagement: FunctionComponent = () => {
     );
   }
 
+  if (!isVisibleForScreen) {
+    return (
+      <div className="px-4">
+        <Alrert
+          title="Not available"
+          message="Please open in desktop, this feature is not available for this screen size (over 768px)"
+          type="warning"
+        />
+      </div>
+    );
+  }
+  if (uamUsers?.status !== 200) return null;
+
   return (
     <>
-      <div className="px-4 md:hidden">
-        <Alrert title="Not available" message="This feature is not available for this screen size (over 768px)" type="warning" />
-      </div>
       <section className="hidden h-full flex-col space-y-4 px-4 pb-6 md:flex">
         <h1 className="text-2xl">User Management</h1>
         <div className="flex">
