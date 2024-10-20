@@ -43,6 +43,7 @@ const Event: React.FC = () => {
     { eventId: eventId ?? '' },
     {
       refetchOnMountOrArgChange: true,
+      skip: !isLoggedIn,
     },
   );
 

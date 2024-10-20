@@ -1,8 +1,11 @@
-import useMediaQuery from '@/hooks/useMedia';
+// import useMediaQuery from '@/hooks/useMedia';
+import { cn } from '@nextui-org/theme';
 import React from 'react';
-import Barcode from 'react-barcode';
+// import Barcode from 'react-barcode';
 import { IoLocationSharp } from 'react-icons/io5';
+import QRCode from 'react-qr-code';
 import { formateDate } from '../utils/formateDate';
+
 interface ITicketProps {
   ticketId?: string;
   eventName: string;
@@ -23,23 +26,10 @@ const Ticket: React.FC<ITicketProps> = ({
   teamMembers,
   isTicketBooked = false,
 }) => {
-  const isExtraSmall = useMediaQuery('(max-width: 330px)');
+  // const isExtraSmall = useMediaQuery('(max-width: 330px)');
   return (
     <article className="relative flex w-full flex-col rounded-2xl bg-default-100 font-mono xxs:max-w-[310px]">
-      <div className="m-2 flex justify-center rounded-xl bg-primary">
-        <Barcode
-          value={ticketId}
-          displayValue={true}
-          fontSize={15}
-          background="transparent"
-          width={1}
-          height={isExtraSmall ? 50 : 60}
-          marginBottom={isExtraSmall ? 15 : 20}
-        />
-      </div>
-      <div
-        className={`relative space-y-4 border-t-4 border-dotted border-default-300 p-4 before:absolute before:left-0 before:top-0 before:h-8 before:w-8 before:translate-x-[-50%] before:translate-y-[-50%] before:rounded-full before:bg-background after:absolute after:right-0 after:top-0 after:h-8 after:w-8 after:translate-x-[50%] after:translate-y-[-50%] after:rounded-full after:bg-background`}
-      >
+      <div className="space-y-4 p-4">
         <h2 className="mb-6 max-w-[280px] text-2xl">{eventName}</h2>
         <div className="flex">
           <div className="flex-1 space-y-2 font-mono">
@@ -70,7 +60,9 @@ const Ticket: React.FC<ITicketProps> = ({
         className={`relative border-t-4 border-dotted border-default-300 p-4 before:absolute before:left-0 before:top-0 before:h-8 before:w-8 before:translate-x-[-50%] before:translate-y-[-50%] before:rounded-full before:bg-background after:absolute after:right-0 after:top-0 after:h-8 after:w-8 after:translate-x-[50%] after:translate-y-[-50%] after:rounded-full after:bg-background`}
       >
         {isTicketBooked ? (
-          <p className="absolute inset-0 z-0 flex rotate-[-45deg] items-center justify-center text-6xl text-default-600 text-opacity-20">BOOKED</p>
+          <p className="absolute inset-0 z-0 flex rotate-[-45deg] select-none items-center justify-center text-6xl text-default-600 text-opacity-20">
+            BOOKED
+          </p>
         ) : null}
         <div className="mb-6 space-y-5">
           <div className="space-y-2">
@@ -88,6 +80,34 @@ const Ticket: React.FC<ITicketProps> = ({
             </ul>
           </div>
         </div>
+      </div>
+      <div
+        className={cn(
+          `relative flex items-center justify-center space-y-4 border-t-4 border-dotted border-default-300 p-4 before:absolute before:left-0 before:top-0 before:h-8 before:w-8 before:translate-x-[-50%] before:translate-y-[-50%] before:rounded-full before:bg-background after:absolute after:right-0 after:top-0 after:h-8 after:w-8 after:translate-x-[50%] after:translate-y-[-50%] after:rounded-full after:bg-background`,
+        )}
+      >
+        {/* <Barcode
+          value={ticketId}
+          displayValue={true}
+          fontSize={15}
+          background="transparent"
+          width={1}
+          height={isExtraSmall ? 50 : 60}
+          marginBottom={isExtraSmall ? 15 : 20}
+        /> */}
+        <QRCode
+          value={JSON.stringify({
+            ticketId,
+            teamName,
+            teamMembers,
+          })}
+          level="L"
+          fgColor="#ccc"
+          bgColor="transparent"
+          size={200}
+          className="m-4"
+          strokeWidth={0.1}
+        />
       </div>
     </article>
   );

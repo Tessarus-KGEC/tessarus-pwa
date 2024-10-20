@@ -114,11 +114,6 @@ export interface TicketResponse {
   ticketNumber: string;
   event: Pick<EventResponse, 'title'>;
   user: Pick<UserSelfResponse, 'name' | 'email' | 'espektroId'>; // team leader
-  order?: {
-    razorpayPaymentId?: string;
-    razorpayOrderId?: string;
-    paymentVerified?: boolean;
-  };
   isCheckedIn?: boolean;
   checkInTime?: string;
   team?: {
