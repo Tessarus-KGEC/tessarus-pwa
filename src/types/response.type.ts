@@ -109,6 +109,14 @@ export interface BookTicketResponse {
   order?: string;
 }
 
+export interface CheckinTicketArgs {
+  ticketId: string;
+}
+export interface CheckinTicketResponse {
+  _id: string;
+  isCheckedIn: string;
+}
+
 export interface TicketResponse {
   _id: string;
   ticketNumber: string;

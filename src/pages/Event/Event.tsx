@@ -174,6 +174,7 @@ const Event: React.FC = () => {
             eventVenue={eventData.data.eventVenue}
             eventStartDate={eventData.data.startTime}
             eventEndDate={eventData.data.endTime}
+            isCheckedIn={eventTicket?.status === 200 && eventTicket.data.isCheckedIn}
             teamName={teamName}
             teamMembers={teamMembers.map((member) => member.name)}
             isTicketBooked={!!bookedTicketId}
