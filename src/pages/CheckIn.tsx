@@ -40,7 +40,7 @@ const Checkin: FunctionComponent = () => {
 
   const stopScanning = useCallback(() => {
     if (videoRef.current && videoRef.current.srcObject) {
-      console.log('Stopping scanning');
+      // console.log('Stopping scanning');
       const stream = videoRef.current.srcObject as MediaStream;
       stream.getTracks().forEach((track) => track.stop());
 
@@ -64,7 +64,7 @@ const Checkin: FunctionComponent = () => {
     }
 
     autoPauseTimeoutRef.current = setTimeout(() => {
-      console.log('Auto pausing scanning');
+      // console.log('Auto pausing scanning');
       stopScanning();
     }, autoPauseDuration);
   }, [stopScanning, autoPauseScan]);
@@ -108,7 +108,7 @@ const Checkin: FunctionComponent = () => {
       });
       if (!videoRef.current) return;
       videoRef.current.srcObject = stream;
-      console.log('Scanning started');
+      // console.log('Scanning started');
 
       if (!('BarcodeDetector' in window) || !('BarcodeDetector' in globalThis)) {
         window.alert('BarcodeDetector is not supported');
@@ -116,7 +116,7 @@ const Checkin: FunctionComponent = () => {
       }
 
       const detectBarcodes = async () => {
-        console.log('Detecting barcodes', isQRDetectedRef.current);
+        // console.log('Detecting barcodes', isQRDetectedRef.current);
 
         if (!videoRef.current) return;
 
@@ -192,7 +192,7 @@ const Checkin: FunctionComponent = () => {
   // initial start scanning
   useEffect(() => {
     if (videoRef.current) {
-      console.log('this causing restart');
+      // console.log('this causing restart');
       startScanning(videoRef.current);
     }
 
