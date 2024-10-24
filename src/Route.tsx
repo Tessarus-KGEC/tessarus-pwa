@@ -1,4 +1,5 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
+
 import AuthLayout from './layouts/AuthLayout';
 import DashboardLayout from './layouts/DashboardLayout';
 import RootLayout from './layouts/RootLayout';
@@ -13,7 +14,7 @@ import RegisteredEvents from './pages/RegisteredEvents/RegisteredEvents';
 import Signup from './pages/Signup';
 import Transactions from './pages/Transactions/Transactions';
 import UserManagement from './pages/UserManagement/UserManagement';
-import Wallet from './pages/Wallet';
+import Wallet from './pages/Wallet/Wallet';
 import { Route } from './types/route';
 
 const appRouter = createBrowserRouter([

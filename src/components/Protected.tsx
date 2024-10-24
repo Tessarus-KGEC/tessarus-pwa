@@ -1,7 +1,7 @@
 import { PublicPath, RoutePath } from '@/constants/route';
 import { useAppDispatch, useAppSelector } from '@/redux';
 import { useCurrentUserQuery } from '@/redux/api/user.slice';
-import { logout, setCurrentUser, setIsLoggedIn, setToken } from '@/redux/reducers/auth.reducer';
+import { logout, setCurrentUser, setCurrentUserWalletBalance, setIsLoggedIn, setToken } from '@/redux/reducers/auth.reducer';
 import { getAPIErrorMessage } from '@/utils/api.helper';
 import { getLocalStorageItem } from '@/utils/localStorage.helper';
 
@@ -70,6 +70,7 @@ const ProtectedLayout: FunctionComponent<PropsWithChildren> = ({ children }) => 
 
     if (response.status === 200) {
       dispatch(setCurrentUser(response.data));
+      dispatch(setCurrentUserWalletBalance(response.data.wallet));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [response, authToken]);

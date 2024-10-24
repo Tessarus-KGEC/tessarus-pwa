@@ -44,13 +44,14 @@ const useRazorpayPG = () => {
     async (
       args: CreatePaymentOrderArgs & {
         description: string;
-        paymentSuccessCallback: (orderId: string) => Promise<void>;
+        paymentSuccessCallback: (transactionId: string) => Promise<void>;
       },
     ) => {
       setIsPaymentLoading(true);
       const orderData = await createOrder({
         amount: args.amount,
         orderType: args.orderType,
+        eventId: args.eventId,
       }).unwrap();
 
       if (orderData.status !== 201) {
@@ -70,7 +71,7 @@ const useRazorpayPG = () => {
           color: '#554ccc',
         },
         handler: async function (response: { razorpay_payment_id: string; razorpay_order_id: string; razorpay_signature: string }) {
-          if (response.razorpay_payment_id) await args.paymentSuccessCallback(orderData.data.order._id);
+          if (response.razorpay_payment_id) await args.paymentSuccessCallback(orderData.data.transaction);
           setIsPaymentLoading(false);
         },
       };
