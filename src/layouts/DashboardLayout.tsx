@@ -1,3 +1,4 @@
+import Coin from '@/assets/coin.png';
 import EspektroLogo from '@/assets/logo/Espektro logo fill.svg';
 import ProtectedLayout from '@/components/Protected';
 import { RoutePath } from '@/constants/route';
@@ -9,7 +10,7 @@ import { useGSAP } from '@gsap/react';
 import { Avatar } from '@nextui-org/avatar';
 import { Button } from '@nextui-org/button';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/dropdown';
-import { Image } from '@nextui-org/react';
+import { Chip, Image } from '@nextui-org/react';
 import gsap from 'gsap';
 import { FunctionComponent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
@@ -36,9 +37,9 @@ const ProfileDropdown = () => {
         <Avatar isBordered radius="full" color="secondary" src="https://i.pravatar.cc/150?u=a042581f4e29026704d" className="h-9 w-9 cursor-pointer" />
       </DropdownTrigger>
       <DropdownMenu aria-label="Static Actions">
-        <DropdownItem key="profile">Profile</DropdownItem>
+        {/* <DropdownItem key="profile">Profile</DropdownItem>
         <DropdownItem key="event">Events</DropdownItem>
-        <DropdownItem key="ticket">Tickets</DropdownItem>
+        <DropdownItem key="ticket">Tickets</DropdownItem> */}
         <DropdownItem
           key="logout"
           className="text-danger"
@@ -172,9 +173,27 @@ const Sidebar: FunctionComponent<{
           })}
         </ul>
       </div>
+      <div className="mb-4 mt-auto px-4">
+        {user ? (
+          <div className="flex gap-2 rounded-2xl border-default bg-foreground-100 p-3">
+            <Avatar radius="sm" color="secondary" src="https://i.pravatar.cc/150?u=a042581f4e29026704d" size="lg" />
+            <div className="space-y-1">
+              <p>{user.name}</p>
+              <Chip
+                startContent={<img src={Coin} className="mr-1 aspect-square h-[20px] w-[20px] !blur-none" />}
+                variant="flat"
+                size="sm"
+                className="h-6"
+              >
+                {user.score} XP
+              </Chip>
+            </div>
+          </div>
+        ) : null}
+      </div>
       {renderCustomPWAInstallPrompt ? (
         <Button
-          className="mx-4 mb-5 mt-auto bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg"
+          className="mx-4 mb-5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg"
           onClick={() => {
             if ('prompt' in renderCustomPWAInstallPrompt) {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
