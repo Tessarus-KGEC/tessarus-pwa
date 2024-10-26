@@ -18,4 +18,6 @@ export interface User {
   createdAt: string;
   updatedAt: string;
   permissions: string[];
+
+  score: number;
 }

@@ -7,13 +7,18 @@ import { IoFilter } from 'react-icons/io5';
 import SearchBar from '../../components/SearchBar';
 import Sheet from '../../components/Sheet';
 import Spinner from '../../components/Spinner';
-import { useAppSelector } from '../../redux';
+import useMediaQuery from '../../hooks/useMedia';
+import { useAppDispatch, useAppSelector } from '../../redux';
+import { setNavbarHeaderTitle } from '../../redux/reducers/route.reducer';
 import { IEvent } from '../../types/response.type';
 import EventCard from '../Events/components/EventCard';
 import FilterForm from '../Events/components/FilterForm';
 
 const RegisteredEvents: FunctionComponent = () => {
   const { user, authToken } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+  const isMobile = useMediaQuery('(max-width: 768px)');
+
   const [isFilterOpened, setIsFilterOpened] = useState(false);
   const [events, setEvents] = useState<IEvent[]>([]);
   const [page, setPage] = useState(1);
@@ -104,10 +109,15 @@ const RegisteredEvents: FunctionComponent = () => {
     [isFetchingMoreEvents, hasMore],
   );
 
+  useEffect(() => {
+    dispatch(setNavbarHeaderTitle(isMobile ? 'Registered events' : null));
+  }, [isMobile, dispatch]);
+
   return (
     <div ref={eventPageRef} className="flex h-full flex-1 flex-grow-0 flex-col gap-4">
       <div className="space-y-4 px-4">
-        <h1 className="text-2xl">Registered events</h1>
+        {!isMobile ? <h1 className="text-2xl">Registered events</h1> : null}
+
         <div className="flex gap-4">
           <SearchBar placeholder={`Search your registered event...`} />
           <Button isIconOnly color="default" aria-label="Like" onClick={() => setIsFilterOpened(!isFilterOpened)}>

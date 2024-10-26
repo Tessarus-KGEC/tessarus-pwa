@@ -2,12 +2,16 @@
 import { cn } from '@nextui-org/theme';
 import React from 'react';
 // import Barcode from 'react-barcode';
+import { Button } from '@nextui-org/button';
+import toast from 'react-hot-toast';
+import { IoMdShare } from 'react-icons/io';
 import { IoLocationSharp } from 'react-icons/io5';
 import QRCode from 'react-qr-code';
 import { formateDate } from '../utils/formateDate';
 
 interface ITicketProps {
   ticketId?: string;
+  eventId: string;
   eventName: string;
   eventVenue: string;
   isCheckedIn?: boolean;
@@ -18,7 +22,8 @@ interface ITicketProps {
   isTicketBooked: boolean;
 }
 const Ticket: React.FC<ITicketProps> = ({
-  ticketId = 'exampleticket_____1234567890',
+  ticketId = '',
+  eventId,
   eventName,
   eventVenue,
   eventStartDate,
@@ -29,6 +34,31 @@ const Ticket: React.FC<ITicketProps> = ({
   isTicketBooked = false,
 }) => {
   // const isExtraSmall = useMediaQuery('(max-width: 330px)');
+
+  const handleTicketShare = async () => {
+    const shareData = {
+      title: 'Tessarus',
+      text: `Hey! I'm sharing the ticket for ${eventName} event \n\n`,
+      url: `${window.location.origin}/dashboard/events/${eventId}#ticket-${ticketId}`,
+    };
+
+    if (!navigator.canShare) {
+      toast.error('Web Share API is not supported in your browser');
+      return;
+    }
+    if (!navigator.canShare(shareData)) {
+      toast.error('Cannot share this ticket, issue with the data');
+      return;
+    }
+    try {
+      await navigator.share(shareData);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      // digesting the error
+      return;
+    }
+  };
+
   return (
     <article className="relative flex w-full flex-col rounded-2xl bg-default-100 font-mono xxs:max-w-[310px]">
       <div className="space-y-4 p-4">
@@ -115,6 +145,10 @@ const Ticket: React.FC<ITicketProps> = ({
           strokeWidth={0.1}
         />
       </div>
+      <Button className="m-4" color="primary" onPress={handleTicketShare}>
+        <IoMdShare size={20} />
+        <p>share</p>
+      </Button>
     </article>
   );
 };

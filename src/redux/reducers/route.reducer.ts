@@ -8,11 +8,13 @@ export interface Query {
 }
 
 interface RouteState {
+  navHeaderTitle: string;
   activeRoute: string;
   routeQuery: Query | null;
 }
 
 const initialState = {
+  navHeaderTitle: 'Tessarus',
   activeRoute: '',
   routeQuery: {
     [RouteQuery.TAB]: EventTab.ONGOING,
@@ -23,6 +25,13 @@ const routeSlice = createSlice({
   name: 'route',
   initialState,
   reducers: {
+    setNavbarHeaderTitle(state, action: PayloadAction<string | null>) {
+      if (!action.payload) {
+        state.navHeaderTitle = 'Tessarus';
+        return;
+      }
+      state.navHeaderTitle = action.payload;
+    },
     setActiveRoute(state, action: PayloadAction<string>) {
       state.activeRoute = action.payload;
     },
@@ -39,5 +48,5 @@ const routeSlice = createSlice({
   },
 });
 
-export const { setActiveRoute, setRouteQuery } = routeSlice.actions;
+export const { setActiveRoute, setRouteQuery, setNavbarHeaderTitle } = routeSlice.actions;
 export default routeSlice.reducer;

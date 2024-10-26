@@ -7,12 +7,61 @@ import { IoRefresh, IoTicketOutline } from 'react-icons/io5';
 import QRCorner from '../assets/qr.svg';
 import Alrert from '../components/Alrert';
 import useMediaQuery from '../hooks/useMedia';
+import { useAppDispatch } from '../redux';
 import { useCheckInTicketMutation } from '../redux/api/ticket.slice';
+import { setNavbarHeaderTitle } from '../redux/reducers/route.reducer';
 import { getAPIErrorMessage } from '../utils/api.helper';
 import { ITeamMember } from './Event/Event';
 
+const permissionInstructions = [
+  {
+    browser: 'Google Chrome',
+    instructions: [
+      'Open Chrome',
+      "In the top-right corner, click the three dots and select 'Settings'",
+      // "Scroll down and click 'Privacy and security'",
+      "Scroll down, Click 'Site Settings'",
+      "Under 'Permissions', click 'Camera'",
+      "Find this website in the list and select 'Allow' from the dropdown next to it",
+    ],
+  },
+  {
+    browser: 'Mozilla Firefox',
+    instructions: [
+      'Open Firefox',
+      "Click the menu button (three lines) in the top-right corner and choose 'Settings'",
+      "Go to 'Privacy & Security'",
+      "Scroll down to the 'Permissions' section and find 'Camera'",
+      "Click 'Settings...' next to Camera",
+      "Find this website in the list and change the status to 'Allow'",
+    ],
+  },
+  {
+    browser: 'Safari',
+    instructions: [
+      'Open Safari',
+      "In the top-left corner, click 'Safari' > 'Preferences'",
+      "Go to the 'Websites' tab",
+      "On the left, click 'Camera'",
+      "Find this website in the list on the right and set it to 'Allow'",
+    ],
+  },
+  // {
+  //   browser: 'Microsoft Edge',
+  //   instructions: [
+  //     'Open Edge.',
+  //     "Click the three dots in the top-right corner and select 'Settings'.",
+  //     "In the left menu, click 'Cookies and site permissions'.",
+  //     "Scroll down to 'Camera' under 'All permissions'.",
+  //     "Find this website and click 'Allow'.",
+  //   ],
+  // },
+];
+
 const Checkin: FunctionComponent = () => {
+  const dispatch = useAppDispatch();
   const isVisibleForScreen = useMediaQuery('(max-width: 480px)');
+  const isMobile = useMediaQuery('(max-width: 768px)');
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const [ticketCheckin, { isLoading: isTicketCheckingLoading }] = useCheckInTicketMutation();
@@ -27,6 +76,8 @@ const Checkin: FunctionComponent = () => {
   const [autoResumeScan, setAutoResumeScan] = useState(true);
 
   const [autoPauseScan, setAutoPauseScan] = useState(true);
+
+  const [cameraPermissionRetry, setCameraPermissionRetry] = useState(false);
 
   const animationFrameIdRef = useRef<number | null>(null); // for clearing out animation frames once detected
 
@@ -99,60 +150,68 @@ const Checkin: FunctionComponent = () => {
 
       // defaultFacingMode = hasRearCamera ? 'environment' : 'user';
 
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: defaultFacingMode,
-          width: 640, // atleast it will require less resources for scanning
-          height: 480,
-        },
-      });
-      if (!videoRef.current) return;
-      videoRef.current.srcObject = stream;
-      // console.log('Scanning started');
-
-      if (!('BarcodeDetector' in window) || !('BarcodeDetector' in globalThis)) {
-        window.alert('BarcodeDetector is not supported');
-        return;
-      }
-
-      const detectBarcodes = async () => {
-        // console.log('Detecting barcodes', isQRDetectedRef.current);
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: defaultFacingMode,
+            width: 640, // atleast it will require less resources for scanning
+            height: 480,
+          },
+        });
 
         if (!videoRef.current) return;
+        videoRef.current.srcObject = stream;
+        // console.log('Scanning started');
 
-        if (isQRDetectedRef.current) {
+        if (!('BarcodeDetector' in window) || !('BarcodeDetector' in globalThis)) {
+          window.alert('BarcodeDetector is not supported');
           return;
         }
 
-        const barcodeDetector = new BarcodeDetector({
-          formats: ['qr_code'],
-        });
-        try {
-          barcodeDetector.detect(videoRef.current).then((barCodes) => {
-            if (barCodes.length > 0) {
-              const barcode = barCodes[0];
-              setTicketDetails(JSON.parse(barcode.rawValue));
+        const detectBarcodes = async () => {
+          // console.log('Detecting barcodes', isQRDetectedRef.current);
 
-              isQRDetectedRef.current = true;
+          if (!videoRef.current) return;
 
-              stopScanning();
+          if (isQRDetectedRef.current) {
+            return;
+          }
 
-              // immediately stopping scanning before another requestAnimationFrame is called
-              return;
-            }
+          const barcodeDetector = new BarcodeDetector({
+            formats: ['qr_code'],
           });
+          try {
+            barcodeDetector.detect(videoRef.current).then((barCodes) => {
+              if (barCodes.length > 0) {
+                const barcode = barCodes[0];
+                setTicketDetails(JSON.parse(barcode.rawValue));
 
-          animationFrameIdRef.current = requestAnimationFrame(detectBarcodes);
-        } catch (error) {
-          toast.error('Error while scanning barcode');
-        }
-      };
+                isQRDetectedRef.current = true;
 
-      animationFrameIdRef.current = requestAnimationFrame(detectBarcodes);
+                stopScanning();
 
-      handleAutoPause();
+                // immediately stopping scanning before another requestAnimationFrame is called
+                return;
+              }
+            });
+
+            animationFrameIdRef.current = requestAnimationFrame(detectBarcodes);
+          } catch (error) {
+            toast.error('Error while scanning barcode');
+          }
+        };
+
+        animationFrameIdRef.current = requestAnimationFrame(detectBarcodes);
+
+        handleAutoPause();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        if ('name' in error && error.name === 'NotAllowedError' && !cameraPermissionRetry) setCameraPermissionRetry(true);
+
+        console.error('Error while starting scanning', error);
+      }
     },
-    [stopScanning, handleAutoPause],
+    [stopScanning, handleAutoPause, cameraPermissionRetry],
   );
 
   const handleScanningResume = () => {
@@ -205,6 +264,10 @@ const Checkin: FunctionComponent = () => {
     };
   }, [startScanning, stopScanning]);
 
+  useEffect(() => {
+    dispatch(setNavbarHeaderTitle(isMobile ? 'Check In' : null));
+  }, [isMobile, dispatch]);
+
   if (!isVisibleForScreen) {
     return (
       <div className="px-4">
@@ -213,23 +276,29 @@ const Checkin: FunctionComponent = () => {
     );
   }
 
+  if (cameraPermissionRetry) {
+    return (
+      <section className="h-full w-full space-y-6 px-4">
+        {permissionInstructions.map((permissionInstruction) => (
+          <PermissionInstructionList browser={permissionInstruction.browser} instructions={permissionInstruction.instructions} />
+        ))}
+      </section>
+    );
+  }
+
   return (
     <section className="h-full w-full space-y-1 p-4">
       <div className="p-4">
         <div className="relative aspect-square w-full overflow-hidden rounded-2xl border-primary">
-          {/* tl */}
           <div className="absolute left-0 top-0 z-10 aspect-square w-[55px]">
             <img src={QRCorner} alt="QR Corner" className="h-full w-full" />
           </div>
-          {/* br */}
           <div className="absolute bottom-0 right-0 z-10 aspect-square w-[55px] rotate-180">
             <img src={QRCorner} alt="QR Corner" className="h-full w-full" />
           </div>
-          {/* bl */}
           <div className="absolute bottom-0 left-0 z-10 aspect-square w-[55px] -scale-y-100">
             <img src={QRCorner} alt="QR Corner" className="h-full w-full" />
           </div>
-          {/* bl */}
           <div className="absolute right-0 top-0 z-10 aspect-square w-[55px] -scale-x-100">
             <img src={QRCorner} alt="QR Corner" className="h-full w-full" />
           </div>
@@ -296,5 +365,20 @@ const Checkin: FunctionComponent = () => {
     </section>
   );
 };
+
+function PermissionInstructionList({ browser, instructions }: { browser: string; instructions: string[] }) {
+  return (
+    <div className="space-y-4 rounded-xl p-2">
+      <p>
+        <strong>{browser}</strong>
+      </p>
+      <ol className="!ml-4 !list-decimal font-mono text-sm text-foreground-500">
+        {instructions.map((instruction, index) => (
+          <li key={index}>{instruction}</li>
+        ))}
+      </ol>
+    </div>
+  );
+}
 
 export default Checkin;

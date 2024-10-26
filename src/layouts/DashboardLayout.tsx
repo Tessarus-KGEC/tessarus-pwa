@@ -1,3 +1,4 @@
+import Coin from '@/assets/coin.png';
 import EspektroLogo from '@/assets/logo/Espektro logo fill.svg';
 import ProtectedLayout from '@/components/Protected';
 import { RoutePath } from '@/constants/route';
@@ -9,9 +10,9 @@ import { useGSAP } from '@gsap/react';
 import { Avatar } from '@nextui-org/avatar';
 import { Button } from '@nextui-org/button';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/dropdown';
-import { Image } from '@nextui-org/react';
+import { Chip, Image } from '@nextui-org/react';
 import gsap from 'gsap';
-import { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
+import { FunctionComponent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   IoAnalyticsOutline,
   IoCloseOutline,
@@ -23,82 +24,9 @@ import {
 } from 'react-icons/io5';
 import { MdInstallMobile, MdOutlineAdminPanelSettings, MdOutlineEvent } from 'react-icons/md';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import useMediaQuery from '../hooks/useMedia';
 
 gsap.registerPlugin(useGSAP);
-
-const navlinks: {
-  title: string;
-  route: string;
-  status: 'active' | 'inactive';
-  slug: string;
-  icon: JSX.Element;
-  permissions: string[];
-  protected: boolean;
-}[] = [
-  {
-    title: 'Events',
-    route: Route.EVENTS,
-    status: 'active',
-    slug: Routes[Route.EVENTS].slug,
-    icon: <MdOutlineEvent size={20} />,
-    permissions: Routes[Route.EVENTS].permissions,
-    protected: false,
-  },
-  {
-    title: 'Check in',
-    route: Route.CHECKIN,
-    status: 'active',
-    slug: Routes[Route.CHECKIN].slug,
-    icon: <IoScanOutline size={20} />,
-    permissions: Routes[Route.CHECKIN].permissions,
-    protected: true,
-  },
-  {
-    title: 'Registered events',
-    route: `${Route.EVENTS}/${Route.REGISTERED_EVENTS}`,
-    status: 'active',
-    slug: Routes[Route.REGISTERED_EVENTS].slug,
-    icon: <IoTicketOutline size={20} />,
-    permissions: Routes[Route.REGISTERED_EVENTS].permissions,
-    protected: true,
-  },
-  {
-    title: 'Wallet',
-    route: Route.WALLET,
-    status: 'active',
-    slug: Routes[Route.WALLET].slug,
-    icon: <IoWalletOutline size={20} />,
-    permissions: Routes[Route.WALLET].permissions,
-    protected: true,
-  },
-  {
-    title: 'Analytics',
-    route: Route.ANALYTICS,
-    status: 'active',
-    slug: Routes[Route.ANALYTICS].slug,
-    icon: <IoAnalyticsOutline size={20} />,
-    permissions: Routes[Route.ANALYTICS].permissions,
-    protected: true,
-  },
-  {
-    title: 'Transactions',
-    route: Route.TRANSACTIONS,
-    status: 'active',
-    slug: Routes[Route.TRANSACTIONS].slug,
-    icon: <IoDocumentTextOutline size={20} />,
-    permissions: Routes[Route.TRANSACTIONS].permissions,
-    protected: true,
-  },
-  {
-    title: 'User management',
-    route: Route.USER_MANAGEMENT,
-    status: 'active',
-    slug: Routes[Route.USER_MANAGEMENT].slug,
-    icon: <MdOutlineAdminPanelSettings size={20} />,
-    permissions: Routes[Route.USER_MANAGEMENT].permissions,
-    protected: true,
-  },
-];
 
 const ProfileDropdown = () => {
   const dispatch = useAppDispatch();
@@ -109,9 +37,9 @@ const ProfileDropdown = () => {
         <Avatar isBordered radius="full" color="secondary" src="https://i.pravatar.cc/150?u=a042581f4e29026704d" className="h-9 w-9 cursor-pointer" />
       </DropdownTrigger>
       <DropdownMenu aria-label="Static Actions">
-        <DropdownItem key="profile">Profile</DropdownItem>
+        {/* <DropdownItem key="profile">Profile</DropdownItem>
         <DropdownItem key="event">Events</DropdownItem>
-        <DropdownItem key="ticket">Tickets</DropdownItem>
+        <DropdownItem key="ticket">Tickets</DropdownItem> */}
         <DropdownItem
           key="logout"
           className="text-danger"
@@ -139,8 +67,78 @@ const Sidebar: FunctionComponent<{
 }> = ({ handleClose, classname, hideClose, renderCustomPWAInstallPrompt }) => {
   const { activeRoute } = useAppSelector((state) => state.route);
   const { user } = useAppSelector((state) => state.auth);
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   const isActiveRoute = useCallback((slug: string) => activeRoute === slug, [activeRoute]);
+
+  const navlinks = useMemo(
+    () => [
+      {
+        title: 'Events',
+        route: Route.EVENTS,
+        status: 'active',
+        slug: Routes[Route.EVENTS].slug,
+        icon: <MdOutlineEvent size={20} />,
+        permissions: Routes[Route.EVENTS].permissions,
+        protected: false,
+      },
+      {
+        title: 'Check in',
+        route: Route.CHECKIN,
+        status: isMobile ? 'active' : 'inactive',
+        slug: Routes[Route.CHECKIN].slug,
+        icon: <IoScanOutline size={20} />,
+        permissions: Routes[Route.CHECKIN].permissions,
+        protected: true,
+      },
+      {
+        title: 'Registered events',
+        route: `${Route.EVENTS}/${Route.REGISTERED_EVENTS}`,
+        status: 'active',
+        slug: Routes[Route.REGISTERED_EVENTS].slug,
+        icon: <IoTicketOutline size={20} />,
+        permissions: Routes[Route.REGISTERED_EVENTS].permissions,
+        protected: true,
+      },
+      {
+        title: 'Wallet',
+        route: Route.WALLET,
+        status: isMobile ? 'active' : 'inactive',
+        slug: Routes[Route.WALLET].slug,
+        icon: <IoWalletOutline size={20} />,
+        permissions: Routes[Route.WALLET].permissions,
+        protected: true,
+      },
+      {
+        title: 'Analytics',
+        route: Route.ANALYTICS,
+        status: isMobile ? 'inactive' : 'active',
+        slug: Routes[Route.ANALYTICS].slug,
+        icon: <IoAnalyticsOutline size={20} />,
+        permissions: Routes[Route.ANALYTICS].permissions,
+        protected: true,
+      },
+      {
+        title: 'Transactions',
+        route: Route.TRANSACTIONS,
+        status: isMobile ? 'inactive' : 'active',
+        slug: Routes[Route.TRANSACTIONS].slug,
+        icon: <IoDocumentTextOutline size={20} />,
+        permissions: Routes[Route.TRANSACTIONS].permissions,
+        protected: true,
+      },
+      {
+        title: 'User management',
+        route: Route.USER_MANAGEMENT,
+        status: isMobile ? 'inactive' : 'active',
+        slug: Routes[Route.USER_MANAGEMENT].slug,
+        icon: <MdOutlineAdminPanelSettings size={20} />,
+        permissions: Routes[Route.USER_MANAGEMENT].permissions,
+        protected: true,
+      },
+    ],
+    [isMobile],
+  );
 
   return (
     <nav
@@ -175,9 +173,27 @@ const Sidebar: FunctionComponent<{
           })}
         </ul>
       </div>
+      <div className="mb-2 mt-auto px-4">
+        {user ? (
+          <div className="flex gap-2 rounded-2xl border-default bg-foreground-100 p-3">
+            <Avatar radius="sm" color="secondary" src="https://i.pravatar.cc/150?u=a042581f4e29026704d" size="lg" />
+            <div className="space-y-1">
+              <p>{user.name}</p>
+              <Chip
+                startContent={<img src={Coin} className="mr-1 aspect-square h-[20px] w-[20px] !blur-none" />}
+                variant="flat"
+                size="sm"
+                className="h-6"
+              >
+                {user.score} XP
+              </Chip>
+            </div>
+          </div>
+        ) : null}
+      </div>
       {renderCustomPWAInstallPrompt ? (
         <Button
-          className="mx-4 mb-5 mt-auto bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg"
+          className="mx-4 mb-5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg"
           onClick={() => {
             if ('prompt' in renderCustomPWAInstallPrompt) {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -197,8 +213,11 @@ const DashboardLayout: FunctionComponent = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { isLoggedIn, user } = useAppSelector((state) => state.auth);
+  const { navHeaderTitle } = useAppSelector((state) => state.route);
   const [renderCustomPWAInstallPrompt, setRenderCustomPWAInstallPrompt] = useState<Event | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   const { contextSafe } = useGSAP();
   const handleSideBarOpen = contextSafe(() => {
@@ -256,8 +275,9 @@ const DashboardLayout: FunctionComponent = () => {
                   <IoMenuOutline size={30} onClick={handleSideBarOpen} />
                 </div>
                 <div className="flex items-center gap-2">
-                  <Image src={EspektroLogo} alt="Espektro Logo" width={30} height={30} className="rounded-full" />
-                  <p className="text-xl xs:text-2xl">Tessarus</p>
+                  {!isMobile ? <Image src={EspektroLogo} alt="Espektro Logo" width={30} height={30} className="rounded-full" /> : null}
+
+                  <p className="text-xl xs:text-2xl">{navHeaderTitle}</p>
                 </div>
               </div>
               <div className="lg:ml-auto">
