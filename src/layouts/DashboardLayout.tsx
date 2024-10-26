@@ -11,7 +11,7 @@ import { Button } from '@nextui-org/button';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/dropdown';
 import { Image } from '@nextui-org/react';
 import gsap from 'gsap';
-import { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
+import { FunctionComponent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   IoAnalyticsOutline,
   IoCloseOutline,
@@ -26,80 +26,6 @@ import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import useMediaQuery from '../hooks/useMedia';
 
 gsap.registerPlugin(useGSAP);
-
-const navlinks: {
-  title: string;
-  route: string;
-  status: 'active' | 'inactive';
-  slug: string;
-  icon: JSX.Element;
-  permissions: string[];
-  protected: boolean;
-}[] = [
-  {
-    title: 'Events',
-    route: Route.EVENTS,
-    status: 'active',
-    slug: Routes[Route.EVENTS].slug,
-    icon: <MdOutlineEvent size={20} />,
-    permissions: Routes[Route.EVENTS].permissions,
-    protected: false,
-  },
-  {
-    title: 'Check in',
-    route: Route.CHECKIN,
-    status: 'active',
-    slug: Routes[Route.CHECKIN].slug,
-    icon: <IoScanOutline size={20} />,
-    permissions: Routes[Route.CHECKIN].permissions,
-    protected: true,
-  },
-  {
-    title: 'Registered events',
-    route: `${Route.EVENTS}/${Route.REGISTERED_EVENTS}`,
-    status: 'active',
-    slug: Routes[Route.REGISTERED_EVENTS].slug,
-    icon: <IoTicketOutline size={20} />,
-    permissions: Routes[Route.REGISTERED_EVENTS].permissions,
-    protected: true,
-  },
-  {
-    title: 'Wallet',
-    route: Route.WALLET,
-    status: 'active',
-    slug: Routes[Route.WALLET].slug,
-    icon: <IoWalletOutline size={20} />,
-    permissions: Routes[Route.WALLET].permissions,
-    protected: true,
-  },
-  {
-    title: 'Analytics',
-    route: Route.ANALYTICS,
-    status: 'active',
-    slug: Routes[Route.ANALYTICS].slug,
-    icon: <IoAnalyticsOutline size={20} />,
-    permissions: Routes[Route.ANALYTICS].permissions,
-    protected: true,
-  },
-  {
-    title: 'Transactions',
-    route: Route.TRANSACTIONS,
-    status: 'active',
-    slug: Routes[Route.TRANSACTIONS].slug,
-    icon: <IoDocumentTextOutline size={20} />,
-    permissions: Routes[Route.TRANSACTIONS].permissions,
-    protected: true,
-  },
-  {
-    title: 'User management',
-    route: Route.USER_MANAGEMENT,
-    status: 'active',
-    slug: Routes[Route.USER_MANAGEMENT].slug,
-    icon: <MdOutlineAdminPanelSettings size={20} />,
-    permissions: Routes[Route.USER_MANAGEMENT].permissions,
-    protected: true,
-  },
-];
 
 const ProfileDropdown = () => {
   const dispatch = useAppDispatch();
@@ -140,8 +66,78 @@ const Sidebar: FunctionComponent<{
 }> = ({ handleClose, classname, hideClose, renderCustomPWAInstallPrompt }) => {
   const { activeRoute } = useAppSelector((state) => state.route);
   const { user } = useAppSelector((state) => state.auth);
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   const isActiveRoute = useCallback((slug: string) => activeRoute === slug, [activeRoute]);
+
+  const navlinks = useMemo(
+    () => [
+      {
+        title: 'Events',
+        route: Route.EVENTS,
+        status: 'active',
+        slug: Routes[Route.EVENTS].slug,
+        icon: <MdOutlineEvent size={20} />,
+        permissions: Routes[Route.EVENTS].permissions,
+        protected: false,
+      },
+      {
+        title: 'Check in',
+        route: Route.CHECKIN,
+        status: isMobile ? 'active' : 'inactive',
+        slug: Routes[Route.CHECKIN].slug,
+        icon: <IoScanOutline size={20} />,
+        permissions: Routes[Route.CHECKIN].permissions,
+        protected: true,
+      },
+      {
+        title: 'Registered events',
+        route: `${Route.EVENTS}/${Route.REGISTERED_EVENTS}`,
+        status: 'active',
+        slug: Routes[Route.REGISTERED_EVENTS].slug,
+        icon: <IoTicketOutline size={20} />,
+        permissions: Routes[Route.REGISTERED_EVENTS].permissions,
+        protected: true,
+      },
+      {
+        title: 'Wallet',
+        route: Route.WALLET,
+        status: isMobile ? 'active' : 'inactive',
+        slug: Routes[Route.WALLET].slug,
+        icon: <IoWalletOutline size={20} />,
+        permissions: Routes[Route.WALLET].permissions,
+        protected: true,
+      },
+      {
+        title: 'Analytics',
+        route: Route.ANALYTICS,
+        status: isMobile ? 'inactive' : 'active',
+        slug: Routes[Route.ANALYTICS].slug,
+        icon: <IoAnalyticsOutline size={20} />,
+        permissions: Routes[Route.ANALYTICS].permissions,
+        protected: true,
+      },
+      {
+        title: 'Transactions',
+        route: Route.TRANSACTIONS,
+        status: isMobile ? 'inactive' : 'active',
+        slug: Routes[Route.TRANSACTIONS].slug,
+        icon: <IoDocumentTextOutline size={20} />,
+        permissions: Routes[Route.TRANSACTIONS].permissions,
+        protected: true,
+      },
+      {
+        title: 'User management',
+        route: Route.USER_MANAGEMENT,
+        status: isMobile ? 'inactive' : 'active',
+        slug: Routes[Route.USER_MANAGEMENT].slug,
+        icon: <MdOutlineAdminPanelSettings size={20} />,
+        permissions: Routes[Route.USER_MANAGEMENT].permissions,
+        protected: true,
+      },
+    ],
+    [isMobile],
+  );
 
   return (
     <nav
