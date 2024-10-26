@@ -34,7 +34,7 @@ const UserManagement: FunctionComponent = () => {
   const isMobile = useMediaQuery('(max-width: 768px)');
 
   const isUserAllowedToView = user?.permissions.includes(PERMISSIONS.ADMIN_READONLY);
-  const isVisibleForScreen = useMediaQuery('(min-width: 768px)');
+  // const isVisibleForScreen = useMediaQuery('(min-width: 768px)');
   const allowedPermissionsForSaveChanges = [
     PERMISSIONS.ASSIGN_ROLE,
     PERMISSIONS.REVOKE_ROLE,
@@ -54,10 +54,11 @@ const UserManagement: FunctionComponent = () => {
     callback: () => searchQuery !== '' && setPage(1),
   });
 
-  const { data: uamUsers } = useGetUAMUsersQuery(
+  const { data: uamUsers, isLoading: isUAMDataLoading } = useGetUAMUsersQuery(
     { page, limit, search: debouncedSearch, fromKGEC: true },
     {
-      skip: !isUserAllowedToView || !isVisibleForScreen,
+      // skip: !isUserAllowedToView || !isVisibleForScreen,
+      skip: !isUserAllowedToView,
       refetchOnMountOrArgChange: true,
     },
   );
@@ -99,17 +100,18 @@ const UserManagement: FunctionComponent = () => {
     );
   }
 
-  if (!isVisibleForScreen) {
-    return (
-      <div className="px-4">
-        <Alrert
-          title="Not available"
-          message="Please open in desktop, this feature is not available for this screen size (over 768px)"
-          type="warning"
-        />
-      </div>
-    );
-  }
+  // if (!isVisibleForScreen) {
+  //   return (
+  //     <div className="px-4">
+  //       <Alrert
+  //         title="Not available"
+  //         message="Please open in desktop, this feature is not available for this screen size (over 768px)"
+  //         type="warning"
+  //       />
+  //     </div>
+  //   );
+  // }
+  if (isUAMDataLoading) return <div>Loading...</div>;
   if (uamUsers?.status !== 200) return null;
 
   return (
