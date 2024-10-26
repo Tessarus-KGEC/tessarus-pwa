@@ -173,7 +173,7 @@ const Sidebar: FunctionComponent<{
           })}
         </ul>
       </div>
-      <div className="mb-4 mt-auto px-4">
+      <div className="mb-2 mt-auto px-4">
         {user ? (
           <div className="flex gap-2 rounded-2xl border-default bg-foreground-100 p-3">
             <Avatar radius="sm" color="secondary" src="https://i.pravatar.cc/150?u=a042581f4e29026704d" size="lg" />

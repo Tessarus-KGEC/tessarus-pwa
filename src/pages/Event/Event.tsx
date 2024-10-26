@@ -35,7 +35,7 @@ const Event: React.FC = () => {
   const [isTeamDetailsFormVisible, setIsTeamDetailsFormVisible] = useState(false);
   const [teamName, setTeamName] = useState('');
   const [teamMembers, setTeamMembers] = useState<ITeamMember[]>([]);
-  const [bookedTicketId, setBookedTicketId] = useState<string>();
+  const [bookedTicketId, setBookedTicketId] = useState<string>('');
   const [showPaymentMethodSelectionModal, setShowPaymentMethodSelectionModal] = useState(false);
 
   const { data: eventData, isLoading } = useGetEventQuery(
@@ -70,6 +70,17 @@ const Event: React.FC = () => {
   useEffect(() => {
     dispatch(setNavbarHeaderTitle(isMobile ? 'Event' : null));
   }, [isMobile, dispatch]);
+
+  //! auto scroll to ticket section
+  useEffect(() => {
+    const ticketHash = window.location.hash;
+    if (!ticketHash || !ticketHash.includes('ticket')) return;
+    const ticketSection = document.querySelector(ticketHash);
+
+    if (ticketSection) {
+      ticketSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [bookedTicketId, isTeamCreated]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -178,20 +189,21 @@ const Event: React.FC = () => {
           </div>
         </div>
         {isTeamCreated || bookedTicketId ? (
-          <Ticket
-            ticketId={bookedTicketId}
-            eventName={eventData.data.title}
-            eventVenue={eventData.data.eventVenue}
-            eventStartDate={eventData.data.startTime}
-            eventEndDate={eventData.data.endTime}
-            isCheckedIn={eventTicket?.status === 200 && eventTicket.data.isCheckedIn}
-            teamName={teamName}
-            teamMembers={teamMembers.map((member) => member.name)}
-            isTicketBooked={!!bookedTicketId}
-          />
+          <div id={`ticket-${bookedTicketId}`}>
+            <Ticket
+              ticketId={bookedTicketId}
+              eventId={eventData.data._id}
+              eventName={eventData.data.title}
+              eventVenue={eventData.data.eventVenue}
+              eventStartDate={eventData.data.startTime}
+              eventEndDate={eventData.data.endTime}
+              isCheckedIn={eventTicket?.status === 200 && eventTicket.data.isCheckedIn}
+              teamName={teamName}
+              teamMembers={teamMembers.map((member) => member.name)}
+              isTicketBooked={!!bookedTicketId}
+            />
+          </div>
         ) : null}
-
-        {}
 
         {!isTeamCreated && !bookedTicketId ? (
           <Button
