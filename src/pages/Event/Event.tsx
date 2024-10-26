@@ -10,8 +10,10 @@ import ImageComponent from '../../components/Image';
 import Ticket from '../../components/Ticket';
 import { ORGANISING_CLUB_MAP } from '../../constants';
 import { RoutePath } from '../../constants/route';
-import { useAppSelector } from '../../redux';
+import useMediaQuery from '../../hooks/useMedia';
+import { useAppDispatch, useAppSelector } from '../../redux';
 import { useGetEventQuery, useGetEventsRecommendationQuery } from '../../redux/api/event.slice';
+import { setNavbarHeaderTitle } from '../../redux/reducers/route.reducer';
 import { formateDate } from '../../utils/formateDate';
 import PaymentSelectionModal from './components/PaymentSelectionModal';
 import TeamDetailsForm from './components/TeamDetailsForm';
@@ -22,6 +24,10 @@ export interface ITeamMember
 const Event: React.FC = () => {
   const navigate = useNavigate();
   const { user, isLoggedIn, walletBalance } = useAppSelector((state) => state.auth);
+  const isMobile = useMediaQuery('(max-width: 768px)');
+
+  const dispatch = useAppDispatch();
+
   const { eventId } = useParams<{
     eventId: string;
   }>();
@@ -60,6 +66,10 @@ const Event: React.FC = () => {
   }, [eventTicket]);
 
   const isTeamCreated = useMemo(() => teamName && teamMembers.length > 0, [teamName, teamMembers]);
+
+  useEffect(() => {
+    dispatch(setNavbarHeaderTitle(isMobile ? 'Event' : null));
+  }, [isMobile, dispatch]);
 
   if (isLoading) {
     return <div>Loading...</div>;

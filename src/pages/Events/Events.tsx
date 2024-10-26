@@ -9,7 +9,8 @@ import Sheet from '../../components/Sheet';
 import Spinner from '../../components/Spinner';
 import { PERMISSIONS } from '../../constants';
 import useMediaQuery from '../../hooks/useMedia';
-import { useAppSelector } from '../../redux';
+import { useAppDispatch, useAppSelector } from '../../redux';
+import { setNavbarHeaderTitle } from '../../redux/reducers/route.reducer';
 import { IEvent } from '../../types/response.type';
 import CreateEventForm from './components/CreateEventForm';
 import EventCard from './components/EventCard';
@@ -17,6 +18,10 @@ import FilterForm from './components/FilterForm';
 
 const Events: FunctionComponent = () => {
   const { user } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+
+  const isMobile = useMediaQuery('(max-width: 768px)');
+
   const [isFilterOpened, setIsFilterOpened] = useState(false);
   const [isCreateEventFormOpen, setIsCreateEventFormOpen] = useState(false);
   const [events, setEvents] = useState<IEvent[]>([]);
@@ -105,11 +110,14 @@ const Events: FunctionComponent = () => {
     [isFetchingMoreEvents, hasMore],
   );
 
-  const isMobile = useMediaQuery('(max-width: 768px)');
+  useEffect(() => {
+    dispatch(setNavbarHeaderTitle(isMobile ? 'Events' : null));
+  }, [isMobile, dispatch]);
+
   return (
     <div ref={eventPageRef} className="flex h-full flex-1 flex-grow-0 flex-col gap-4">
       <div className="space-y-4 px-4">
-        <h1 className="text-2xl">Events</h1>
+        {!isMobile ? <h1 className={`text-2xl`}>Events</h1> : null}
         <div className="flex gap-4">
           <SearchBar placeholder={`Search your favorite event...`} />
           <Button isIconOnly color="default" aria-label="Like" onClick={() => setIsFilterOpened(!isFilterOpened)}>

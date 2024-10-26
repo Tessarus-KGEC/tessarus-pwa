@@ -7,12 +7,16 @@ import { IoRefresh, IoTicketOutline } from 'react-icons/io5';
 import QRCorner from '../assets/qr.svg';
 import Alrert from '../components/Alrert';
 import useMediaQuery from '../hooks/useMedia';
+import { useAppDispatch } from '../redux';
 import { useCheckInTicketMutation } from '../redux/api/ticket.slice';
+import { setNavbarHeaderTitle } from '../redux/reducers/route.reducer';
 import { getAPIErrorMessage } from '../utils/api.helper';
 import { ITeamMember } from './Event/Event';
 
 const Checkin: FunctionComponent = () => {
+  const dispatch = useAppDispatch();
   const isVisibleForScreen = useMediaQuery('(max-width: 480px)');
+  const isMobile = useMediaQuery('(max-width: 768px)');
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
   const [ticketCheckin, { isLoading: isTicketCheckingLoading }] = useCheckInTicketMutation();
@@ -204,6 +208,10 @@ const Checkin: FunctionComponent = () => {
       }
     };
   }, [startScanning, stopScanning]);
+
+  useEffect(() => {
+    dispatch(setNavbarHeaderTitle(isMobile ? 'Check In' : null));
+  }, [isMobile, dispatch]);
 
   if (!isVisibleForScreen) {
     return (

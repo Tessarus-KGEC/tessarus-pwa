@@ -1,11 +1,11 @@
-import { FunctionComponent, useMemo, useState } from 'react';
+import { FunctionComponent, useEffect, useMemo, useState } from 'react';
 
 import Alrert from '@/components/Alrert';
 import SearchBar from '@/components/SearchBar';
 import { PERMISSIONS } from '@/constants';
 import useDebounceSearch from '@/hooks/useDebounce';
 import useMediaQuery from '@/hooks/useMedia';
-import { useAppSelector } from '@/redux';
+import { useAppDispatch, useAppSelector } from '@/redux';
 import { useGetUAMUsersQuery } from '@/redux/api/userManagement.slice';
 import {
   Button,
@@ -24,10 +24,15 @@ import {
   User,
 } from '@nextui-org/react';
 
+import { setNavbarHeaderTitle } from '../../redux/reducers/route.reducer';
 import ChangeConfirmModal from './components/ChangeConfirmModal';
 
 const UserManagement: FunctionComponent = () => {
   const { user } = useAppSelector((state) => state.auth);
+
+  const dispatch = useAppDispatch();
+  const isMobile = useMediaQuery('(max-width: 768px)');
+
   const isUserAllowedToView = user?.permissions.includes(PERMISSIONS.ADMIN_READONLY);
   const isVisibleForScreen = useMediaQuery('(min-width: 768px)');
   const allowedPermissionsForSaveChanges = [
@@ -39,6 +44,10 @@ const UserManagement: FunctionComponent = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const limit = 15;
+
+  useEffect(() => {
+    dispatch(setNavbarHeaderTitle(isMobile ? 'User Management' : null));
+  }, [isMobile, dispatch]);
 
   const debouncedSearch = useDebounceSearch({
     query: searchQuery,
@@ -106,7 +115,7 @@ const UserManagement: FunctionComponent = () => {
   return (
     <>
       <section className="hidden h-full flex-col space-y-4 px-4 pb-6 md:flex">
-        <h1 className="text-2xl">User Management</h1>
+        {!isMobile ? <h1 className="text-2xl">User Management</h1> : null}
         <div className="flex">
           <div className="flex flex-1 gap-4">
             <SearchBar placeholder={`Search user name...`} className="max-w-[450px]" onChange={(e) => setSearchQuery(e.target.value)} />

@@ -23,6 +23,7 @@ import {
 } from 'react-icons/io5';
 import { MdInstallMobile, MdOutlineAdminPanelSettings, MdOutlineEvent } from 'react-icons/md';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import useMediaQuery from '../hooks/useMedia';
 
 gsap.registerPlugin(useGSAP);
 
@@ -197,8 +198,11 @@ const DashboardLayout: FunctionComponent = () => {
   const { pathname } = useLocation();
   const navigate = useNavigate();
   const { isLoggedIn, user } = useAppSelector((state) => state.auth);
+  const { navHeaderTitle } = useAppSelector((state) => state.route);
   const [renderCustomPWAInstallPrompt, setRenderCustomPWAInstallPrompt] = useState<Event | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   const { contextSafe } = useGSAP();
   const handleSideBarOpen = contextSafe(() => {
@@ -256,8 +260,9 @@ const DashboardLayout: FunctionComponent = () => {
                   <IoMenuOutline size={30} onClick={handleSideBarOpen} />
                 </div>
                 <div className="flex items-center gap-2">
-                  <Image src={EspektroLogo} alt="Espektro Logo" width={30} height={30} className="rounded-full" />
-                  <p className="text-xl xs:text-2xl">Tessarus</p>
+                  {!isMobile ? <Image src={EspektroLogo} alt="Espektro Logo" width={30} height={30} className="rounded-full" /> : null}
+
+                  <p className="text-xl xs:text-2xl">{navHeaderTitle}</p>
                 </div>
               </div>
               <div className="lg:ml-auto">

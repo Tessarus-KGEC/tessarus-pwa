@@ -1,14 +1,16 @@
-import { FunctionComponent, useCallback, useState } from 'react';
+import { FunctionComponent, useCallback, useEffect, useState } from 'react';
 
 import { Input } from '@nextui-org/input';
 import { Button, Chip } from '@nextui-org/react';
 import toast from 'react-hot-toast';
 import { IoAddCircleOutline, IoShareOutline } from 'react-icons/io5';
 import Alrert from '../../components/Alrert';
+import useMediaQuery from '../../hooks/useMedia';
 import useRazorpayPG from '../../hooks/useRazorpayPG';
 import { useAppDispatch, useAppSelector } from '../../redux';
 import { useAddAmountMutation } from '../../redux/api/wallet.slice';
 import { setCurrentUserWalletBalance } from '../../redux/reducers/auth.reducer';
+import { setNavbarHeaderTitle } from '../../redux/reducers/route.reducer';
 
 const tabs = [
   {
@@ -35,6 +37,9 @@ const tabs = [
 
 const Wallet: FunctionComponent = () => {
   const { walletBalance } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
+  const isMobile = useMediaQuery('(max-width: 768px)');
+
   const [activeTab, setActiveTab] = useState(tabs[0].key);
 
   const renderTabs = useCallback(
@@ -78,10 +83,14 @@ const Wallet: FunctionComponent = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
+  useEffect(() => {
+    dispatch(setNavbarHeaderTitle(isMobile ? 'Wallet' : null));
+  }, [isMobile, dispatch]);
+
   return (
     <section>
       <section className="h-full flex-col space-y-4 px-4 pb-6">
-        <h1 className="text-2xl">My Wallet</h1>
+        {!isMobile ? <h1 className="text-2xl">My Wallet</h1> : null}
         <div className="w-full space-y-2 rounded-xl bg-primary p-4 xs:max-w-[300px]">
           <h2 className="text-sm">Wallet Balance</h2>
           <p className="text-4xl">₹{walletBalance}</p>
