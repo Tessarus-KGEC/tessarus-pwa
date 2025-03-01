@@ -4,10 +4,11 @@ import axios, { AxiosError } from 'axios';
 import { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { IoAdd, IoFilter } from 'react-icons/io5';
+import { useSearchParams } from 'react-router-dom';
 import SearchBar from '../../components/SearchBar';
-import Sheet from '../../components/Sheet';
 import Spinner from '../../components/Spinner';
 import { PERMISSIONS } from '../../constants';
+import useDebounceSearch from '../../hooks/useDebounce';
 import useMediaQuery from '../../hooks/useMedia';
 import { useAppDispatch, useAppSelector } from '../../redux';
 import { setNavbarHeaderTitle } from '../../redux/reducers/route.reducer';
@@ -22,7 +23,11 @@ const Events: FunctionComponent = () => {
 
   const isMobile = useMediaQuery('(max-width: 768px)');
 
+  const [searchQuery, setSearchQuery] = useState('');
   const [isFilterOpened, setIsFilterOpened] = useState(false);
+
+  const [searchParams] = useSearchParams();
+
   const [isCreateEventFormOpen, setIsCreateEventFormOpen] = useState(false);
   const [events, setEvents] = useState<IEvent[]>([]);
   const [page, setPage] = useState(1);
@@ -34,13 +39,14 @@ const Events: FunctionComponent = () => {
 
   const observer = useRef<IntersectionObserver | null>(null);
 
-  const fetchEvents = async ({ page, limit }: { page: number; limit: number }) => {
+  const debouncedSearch = useDebounceSearch({
+    query: searchQuery,
+    callback: () => searchQuery !== '' && setPage(1),
+  });
+
+  const fetchEvents = async ({ page, limit, search }: { page: number; limit: number; search: string }) => {
     try {
-      const query = new URLSearchParams();
-      if (page && limit) {
-        query.append('page', page.toString());
-        query.append('limit', limit.toString());
-      }
+      const query = Object.fromEntries(searchParams.entries());
 
       const resp = await axios.get<{
         data: {
@@ -50,12 +56,15 @@ const Events: FunctionComponent = () => {
           currentPage: number;
           hasMore: boolean;
         };
-      }>(`${import.meta.env.VITE_API_URL}/events?${query.toString()}`, {
-        headers: {
-          'ngrok-skip-browser-warning': 'true',
-          'Content-Type': 'application/json',
+      }>(
+        `${import.meta.env.VITE_API_URL}/events?${search ? `search=${search}&` : ''}page=${page}&limit=${limit}&isFromKGEC=${user?.isFromKGEC ?? false}&${new URLSearchParams(query).toString()}`,
+        {
+          headers: {
+            'ngrok-skip-browser-warning': 'true',
+            'Content-Type': 'application/json',
+          },
         },
-      });
+      );
 
       return resp.data.data;
     } catch (error) {
@@ -69,21 +78,45 @@ const Events: FunctionComponent = () => {
     }
   };
 
-  const loadMoreEvents = async () => {
-    setFetchingMoreEvents(true);
-    const data = await fetchEvents({ page, limit: 10 });
-    if (data) {
-      const newEventsSet = new Set([...events, ...data.events]);
-      setEvents(Array.from(newEventsSet));
-      setHasMore(data.hasMore);
-    }
-    setFetchingMoreEvents(false);
-  };
+  // const loadMoreEvents = async () => {
+  //   setFetchingMoreEvents(true);
+  //   const data = await fetchEvents({ page, limit: 10 });
+  //   if (data) {
+  //     const newEventsSet = new Set([...events, ...data.events]);
+  //     setEvents(Array.from(newEventsSet));
+  //     setHasMore(data.hasMore);
+  //   }
+  //   setFetchingMoreEvents(false);
+  // };
+
+  // useEffect(() => {
+  //   console.log('fetching');
+  //   loadMoreEvents();
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [page, searchParams]);
 
   useEffect(() => {
-    loadMoreEvents();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page]);
+    const fetchNewEvents = async () => {
+      setFetchingMoreEvents(true);
+
+      const data = await fetchEvents({ page, limit: 10, search: debouncedSearch });
+
+      if (data) {
+        if (page === 1) {
+          setEvents(data.events);
+        } else {
+          setEvents((prevEvents) => [...prevEvents, ...data.events]);
+        }
+        setHasMore(data.hasMore);
+      } else {
+        setEvents([]);
+      }
+
+      setFetchingMoreEvents(false);
+    };
+
+    fetchNewEvents();
+  }, [searchParams, page, user?.isFromKGEC, debouncedSearch]);
 
   const lastEventCardRef = useCallback(
     (node: HTMLLIElement) => {
@@ -100,7 +133,7 @@ const Events: FunctionComponent = () => {
         {
           root: eventPageRef.current,
           threshold: 1,
-          rootMargin: '0px',
+          rootMargin: '50px',
         },
       );
 
@@ -119,15 +152,16 @@ const Events: FunctionComponent = () => {
       <div className="space-y-4 px-4">
         {!isMobile ? <h1 className={`text-2xl`}>Events</h1> : null}
         <div className="flex gap-4">
-          <SearchBar placeholder={`Search your favorite event...`} />
-          <Button isIconOnly color="default" aria-label="Like" onClick={() => setIsFilterOpened(!isFilterOpened)}>
-            <IoFilter size={24} />
+          <SearchBar placeholder={`Search your favorite event...`} className="max-w-[450px]" onChange={(e) => setSearchQuery(e.target.value)} />
+          <Button color="default" aria-label="Like" onClick={() => setIsFilterOpened(!isFilterOpened)}>
+            <IoFilter size={20} />
+            Filters
           </Button>
           {!user || !user.isFromKGEC || !user.permissions.includes(PERMISSIONS.CREATE_EVENT) ? null : (
             <Button
               isIconOnly={isMobile}
               color="primary"
-              className={`space-x-2 ${!isMobile ? '!px-6' : ''}`}
+              className={`space-x-2 ${!isMobile ? '!px-6' : ''} ml-auto`}
               onClick={() => setIsCreateEventFormOpen(true)}
             >
               <span>
@@ -165,9 +199,14 @@ const Events: FunctionComponent = () => {
       </ScrollShadow>
 
       {/* Fillter form */}
-      <Sheet open={isFilterOpened} onClose={() => setIsFilterOpened(false)}>
-        <FilterForm />
-      </Sheet>
+
+      <FilterForm
+        isFilterOpened={isFilterOpened}
+        setIsFilterOpened={(value) => {
+          setPage(1);
+          setIsFilterOpened(value);
+        }}
+      />
 
       {/* Create event form */}
       <CreateEventForm

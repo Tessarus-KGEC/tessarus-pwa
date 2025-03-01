@@ -30,10 +30,16 @@ async function main() {
     console.log('push event', event);
     const payload = event.data?.text() ?? 'no payload';
     event.waitUntil(
-      self.registration.showNotification('Tessarus', {
+      self.registration.showNotification('Tessarus KGEC', {
         body: JSON.parse(payload),
+        icon: 'https://res.cloudinary.com/dvgapxbzj/image/upload/v1730005376/tessarus-25/tessarus-email-logo.png',
+        badge: 'https://res.cloudinary.com/dvgapxbzj/image/upload/v1730005376/tessarus-25/tessarus-email-logo.png',
       }),
     );
+  });
+
+  self.addEventListener('notificationclick', (event) => {
+    console.log('notification clicked', event);
   });
 }
 

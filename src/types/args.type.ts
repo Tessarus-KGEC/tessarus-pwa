@@ -11,6 +11,11 @@ export interface VerifyOTPArgs {
 export interface GetAllEventsArgs {
   page?: number;
   limit?: number;
+  search?: string;
+  status?: string;
+  eventType?: string;
+  club?: string;
+  freeEvent?: boolean;
 }
 
 export interface CreateEventArgs {
