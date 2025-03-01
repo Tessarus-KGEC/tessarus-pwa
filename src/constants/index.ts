@@ -82,3 +82,25 @@ export const PaymentMethodMap = {
 export const FallbacKImage = 'https://via.placeholder.com/300x200';
 
 export type PaymentMethod = (typeof PaymentMethodMap)[keyof typeof PaymentMethodMap];
+
+export const PointsMap = {
+  DAILY_ACTIVE: 'daily_active',
+  EVENT_REGISTRATION: 'event_registration',
+  EVENT_PARTICIPATION: 'event_participation',
+  EVENT_WINNER: 'event_winner',
+  EVENT_RUNNER_UP: 'event_runner_up',
+  EVENT_THIRD: 'event_third',
+  REFER_FRIEND: 'refer_friend',
+  WALLET_RECHARGE: 'wallet_recharge',
+} as const;
+
+export const PointsDescriptionMap = {
+  [PointsMap.DAILY_ACTIVE]: 'Earn points daily by being active on the platform.',
+  [PointsMap.EVENT_REGISTRATION]: 'Get rewarded for registering for events on the platform.',
+  [PointsMap.EVENT_PARTICIPATION]: 'Earn points for actively participating in events.',
+  [PointsMap.EVENT_WINNER]: 'Winning an event grants you bonus points!',
+  [PointsMap.EVENT_RUNNER_UP]: 'Secure second place in an event to earn additional points.',
+  [PointsMap.EVENT_THIRD]: 'Finish in third place and receive points as a reward.',
+  [PointsMap.REFER_FRIEND]: 'Invite friends to join and earn points when they sign up.',
+  [PointsMap.WALLET_RECHARGE]: 'Recharge your wallet and get rewarded with points.',
+} as const;
