@@ -8,6 +8,7 @@ import { useSearchParams } from 'react-router-dom';
 import SearchBar from '../../components/SearchBar';
 import Spinner from '../../components/Spinner';
 import { PERMISSIONS } from '../../constants';
+import useDebounceSearch from '../../hooks/useDebounce';
 import useMediaQuery from '../../hooks/useMedia';
 import { useAppDispatch, useAppSelector } from '../../redux';
 import { setNavbarHeaderTitle } from '../../redux/reducers/route.reducer';
@@ -22,6 +23,7 @@ const Events: FunctionComponent = () => {
 
   const isMobile = useMediaQuery('(max-width: 768px)');
 
+  const [searchQuery, setSearchQuery] = useState('');
   const [isFilterOpened, setIsFilterOpened] = useState(false);
 
   const [searchParams] = useSearchParams();
@@ -37,7 +39,12 @@ const Events: FunctionComponent = () => {
 
   const observer = useRef<IntersectionObserver | null>(null);
 
-  const fetchEvents = async ({ page, limit }: { page: number; limit: number }) => {
+  const debouncedSearch = useDebounceSearch({
+    query: searchQuery,
+    callback: () => searchQuery !== '' && setPage(1),
+  });
+
+  const fetchEvents = async ({ page, limit, search }: { page: number; limit: number; search: string }) => {
     try {
       const query = Object.fromEntries(searchParams.entries());
 
@@ -50,7 +57,7 @@ const Events: FunctionComponent = () => {
           hasMore: boolean;
         };
       }>(
-        `${import.meta.env.VITE_API_URL}/events?page=${page}&limit=${limit}&isFromKGEC=${user?.isFromKGEC ?? false}&${new URLSearchParams(query).toString()}`,
+        `${import.meta.env.VITE_API_URL}/events?${search ? `search=${search}&` : ''}page=${page}&limit=${limit}&isFromKGEC=${user?.isFromKGEC ?? false}&${new URLSearchParams(query).toString()}`,
         {
           headers: {
             'ngrok-skip-browser-warning': 'true',
@@ -92,7 +99,7 @@ const Events: FunctionComponent = () => {
     const fetchNewEvents = async () => {
       setFetchingMoreEvents(true);
 
-      const data = await fetchEvents({ page, limit: 10 });
+      const data = await fetchEvents({ page, limit: 10, search: debouncedSearch });
 
       if (data) {
         if (page === 1) {
@@ -109,7 +116,7 @@ const Events: FunctionComponent = () => {
     };
 
     fetchNewEvents();
-  }, [searchParams, page, user?.isFromKGEC]);
+  }, [searchParams, page, user?.isFromKGEC, debouncedSearch]);
 
   const lastEventCardRef = useCallback(
     (node: HTMLLIElement) => {
@@ -145,15 +152,16 @@ const Events: FunctionComponent = () => {
       <div className="space-y-4 px-4">
         {!isMobile ? <h1 className={`text-2xl`}>Events</h1> : null}
         <div className="flex gap-4">
-          <SearchBar placeholder={`Search your favorite event...`} />
-          <Button isIconOnly color="default" aria-label="Like" onClick={() => setIsFilterOpened(!isFilterOpened)}>
-            <IoFilter size={24} />
+          <SearchBar placeholder={`Search your favorite event...`} className="max-w-[450px]" onChange={(e) => setSearchQuery(e.target.value)} />
+          <Button color="default" aria-label="Like" onClick={() => setIsFilterOpened(!isFilterOpened)}>
+            <IoFilter size={20} />
+            Filters
           </Button>
           {!user || !user.isFromKGEC || !user.permissions.includes(PERMISSIONS.CREATE_EVENT) ? null : (
             <Button
               isIconOnly={isMobile}
               color="primary"
-              className={`space-x-2 ${!isMobile ? '!px-6' : ''}`}
+              className={`space-x-2 ${!isMobile ? '!px-6' : ''} ml-auto`}
               onClick={() => setIsCreateEventFormOpen(true)}
             >
               <span>
