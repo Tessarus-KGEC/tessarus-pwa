@@ -65,6 +65,7 @@ const Sidebar: FunctionComponent<{
   handleClose?: () => void;
   renderCustomPWAInstallPrompt?: Event | null;
 }> = ({ handleClose, classname, hideClose, renderCustomPWAInstallPrompt }) => {
+  const navigate = useNavigate();
   const { activeRoute } = useAppSelector((state) => state.route);
   const { user } = useAppSelector((state) => state.auth);
   const isMobile = useMediaQuery('(max-width: 768px)');
@@ -146,7 +147,7 @@ const Sidebar: FunctionComponent<{
       className={`flex h-full w-[280px] flex-col gap-4 rounded-br-lg rounded-tr-lg border-red-400 text-default-600 backdrop-blur-sm dark:bg-default-50 xs:w-[300px] ${classname}`}
     >
       <div className="flex justify-between gap-4 px-4 py-5 md:px-6">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 hover:cursor-pointer" onClick={() => navigate('/dashboard/events')}>
           <Image src={EspektroLogo} alt="Espektro Logo" width={30} height={30} className="rounded-full" />
           <p className="text-xl xs:text-2xl">Tessarus</p>
         </div>
