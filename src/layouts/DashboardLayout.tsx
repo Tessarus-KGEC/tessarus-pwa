@@ -10,13 +10,13 @@ import { useGSAP } from '@gsap/react';
 import { Avatar } from '@nextui-org/avatar';
 import { Button } from '@nextui-org/button';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/dropdown';
-import { Chip, Image } from '@nextui-org/react';
+import { Chip, Image, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react';
 import gsap from 'gsap';
 import { FunctionComponent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  IoAnalyticsOutline,
   IoCloseOutline,
   IoDocumentTextOutline,
+  IoInformationCircle,
   IoMenuOutline,
   IoScanOutline,
   IoTicketOutline,
@@ -24,6 +24,7 @@ import {
 } from 'react-icons/io5';
 import { MdInstallMobile, MdOutlineAdminPanelSettings, MdOutlineEvent } from 'react-icons/md';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { PointsDescriptionMap } from '../constants';
 import useMediaQuery from '../hooks/useMedia';
 
 gsap.registerPlugin(useGSAP);
@@ -65,6 +66,7 @@ const Sidebar: FunctionComponent<{
   handleClose?: () => void;
   renderCustomPWAInstallPrompt?: Event | null;
 }> = ({ handleClose, classname, hideClose, renderCustomPWAInstallPrompt }) => {
+  const navigate = useNavigate();
   const { activeRoute } = useAppSelector((state) => state.route);
   const { user } = useAppSelector((state) => state.auth);
   const isMobile = useMediaQuery('(max-width: 768px)');
@@ -109,15 +111,15 @@ const Sidebar: FunctionComponent<{
         permissions: Routes[Route.WALLET].permissions,
         protected: true,
       },
-      {
-        title: 'Analytics',
-        route: Route.ANALYTICS,
-        status: isMobile ? 'inactive' : 'active',
-        slug: Routes[Route.ANALYTICS].slug,
-        icon: <IoAnalyticsOutline size={20} />,
-        permissions: Routes[Route.ANALYTICS].permissions,
-        protected: true,
-      },
+      // {
+      //   title: 'Analytics',
+      //   route: Route.ANALYTICS,
+      //   status: isMobile ? 'inactive' : 'active',
+      //   slug: Routes[Route.ANALYTICS].slug,
+      //   icon: <IoAnalyticsOutline size={20} />,
+      //   permissions: Routes[Route.ANALYTICS].permissions,
+      //   protected: true,
+      // },
       {
         title: 'Transactions',
         route: Route.TRANSACTIONS,
@@ -146,7 +148,7 @@ const Sidebar: FunctionComponent<{
       className={`flex h-full w-[280px] flex-col gap-4 rounded-br-lg rounded-tr-lg border-red-400 text-default-600 backdrop-blur-sm dark:bg-default-50 xs:w-[300px] ${classname}`}
     >
       <div className="flex justify-between gap-4 px-4 py-5 md:px-6">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 hover:cursor-pointer" onClick={() => navigate('/dashboard/events')}>
           <Image src={EspektroLogo} alt="Espektro Logo" width={30} height={30} className="rounded-full" />
           <p className="text-xl xs:text-2xl">Tessarus</p>
         </div>
@@ -175,18 +177,21 @@ const Sidebar: FunctionComponent<{
       </div>
       <div className="mb-2 mt-auto px-4">
         {user ? (
-          <div className="flex gap-2 rounded-2xl border-default bg-foreground-100 p-3">
+          <div className="flex gap-2 rounded-2xl border-default bg-foreground-100 p-3 hover:cursor-pointer">
             <Avatar radius="sm" color="secondary" src="https://i.pravatar.cc/150?u=a042581f4e29026704d" size="lg" />
             <div className="space-y-1">
               <p>{user.name}</p>
-              <Chip
-                startContent={<img src={Coin} className="mr-1 aspect-square h-[20px] w-[20px] !blur-none" />}
-                variant="flat"
-                size="sm"
-                className="h-6"
-              >
-                {user.score} XP
-              </Chip>
+              <div className="flex gap-2">
+                <Chip
+                  startContent={<img src={Coin} className="mr-1 aspect-square h-[20px] w-[20px] !blur-none" />}
+                  variant="flat"
+                  size="sm"
+                  className="h-6"
+                >
+                  {user.score} XP
+                </Chip>
+                <PointsInfoModal />
+              </div>
             </div>
           </div>
         ) : null}
@@ -312,6 +317,32 @@ const DashboardLayout: FunctionComponent = () => {
         </div>
       </ProtectedLayout>
     </RouteWrapper>
+  );
+};
+
+const PointsInfoModal = () => {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <IoInformationCircle size={22} onClick={() => setOpen(true)} />
+      <Modal isOpen={open} onOpenChange={setOpen} backdrop={'opaque'} className="bg-default-50 text-default-foreground dark">
+        <ModalContent>
+          {() => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">Types of points</ModalHeader>
+              <ModalBody>
+                <ul className="!ml-2 !list-disc">
+                  {Object.entries(PointsDescriptionMap).map(([_, info]) => (
+                    <li className="text-md mt-2 text-default-600">{info}</li>
+                  ))}
+                </ul>
+              </ModalBody>
+              <ModalFooter></ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+    </>
   );
 };
 
