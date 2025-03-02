@@ -10,14 +10,12 @@ import { useGSAP } from '@gsap/react';
 import { Avatar } from '@nextui-org/avatar';
 import { Button } from '@nextui-org/button';
 import { Dropdown, DropdownItem, DropdownMenu, DropdownTrigger } from '@nextui-org/dropdown';
-import { Chip, Image, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Popover, PopoverContent, PopoverTrigger } from '@nextui-org/react';
+import { Chip, Image, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@nextui-org/react';
 import gsap from 'gsap';
 import { FunctionComponent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  IoAnalyticsOutline,
   IoCloseOutline,
   IoDocumentTextOutline,
-  IoInformation,
   IoInformationCircle,
   IoMenuOutline,
   IoScanOutline,
@@ -113,15 +111,15 @@ const Sidebar: FunctionComponent<{
         permissions: Routes[Route.WALLET].permissions,
         protected: true,
       },
-      {
-        title: 'Analytics',
-        route: Route.ANALYTICS,
-        status: isMobile ? 'inactive' : 'active',
-        slug: Routes[Route.ANALYTICS].slug,
-        icon: <IoAnalyticsOutline size={20} />,
-        permissions: Routes[Route.ANALYTICS].permissions,
-        protected: true,
-      },
+      // {
+      //   title: 'Analytics',
+      //   route: Route.ANALYTICS,
+      //   status: isMobile ? 'inactive' : 'active',
+      //   slug: Routes[Route.ANALYTICS].slug,
+      //   icon: <IoAnalyticsOutline size={20} />,
+      //   permissions: Routes[Route.ANALYTICS].permissions,
+      //   protected: true,
+      // },
       {
         title: 'Transactions',
         route: Route.TRANSACTIONS,
@@ -334,7 +332,7 @@ const PointsInfoModal = () => {
               <ModalHeader className="flex flex-col gap-1">Types of points</ModalHeader>
               <ModalBody>
                 <ul className="!ml-2 !list-disc">
-                  {Object.entries(PointsDescriptionMap).map(([key, info]) => (
+                  {Object.entries(PointsDescriptionMap).map(([_, info]) => (
                     <li className="text-md mt-2 text-default-600">{info}</li>
                   ))}
                 </ul>
