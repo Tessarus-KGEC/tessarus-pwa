@@ -10,9 +10,10 @@ import { useVerfiyOTPMutation } from '@/redux/api/auth.slice';
 import { setIsLoggedIn, setToken } from '@/redux/reducers/auth.reducer';
 import { getAPIErrorMessage } from '@/utils/api.helper';
 import toast from 'react-hot-toast';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 const Otp: FunctionComponent = () => {
+  const location = useLocation();
   const navigate = useNavigate();
   const { otp_token } = useParams();
   const { email } = useAppSelector((state) => state.auth);
@@ -52,7 +53,9 @@ const Otp: FunctionComponent = () => {
           resolve(0);
         });
 
-        navigate(RoutePath.events());
+        const fromRoute = location.state?.from;
+
+        navigate(fromRoute ?? RoutePath.events());
       }
     } catch (error) {
       toast.error(getAPIErrorMessage(error));

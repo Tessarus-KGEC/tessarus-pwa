@@ -174,7 +174,7 @@ const UserManagement: FunctionComponent = () => {
                       <TableCell className="max-w-[300px]">
                         <User
                           name={user.name}
-                          description={user.phone}
+                          description={user.email}
                           avatarProps={{
                             src: user.profileImageUrl,
                           }}

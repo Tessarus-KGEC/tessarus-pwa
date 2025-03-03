@@ -209,10 +209,14 @@ const Event: React.FC = () => {
           <Button
             color={'primary'}
             className="w-full text-center font-semibold md:w-[200px]"
-            isDisabled={!isLoggedIn}
+            // isDisabled={!isLoggedIn}
             onClick={async () => {
               if (!isLoggedIn || !user) {
-                navigate(RoutePath.login());
+                navigate(RoutePath.login(), {
+                  state: {
+                    from: `/dashboard/events/${eventId}`,
+                  },
+                });
                 return;
               }
               setIsTeamDetailsFormVisible(true);

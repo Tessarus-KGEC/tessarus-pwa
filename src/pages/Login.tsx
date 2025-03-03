@@ -7,9 +7,10 @@ import { getAPIErrorMessage } from '@/utils/api.helper';
 import { Button, Card, CardBody, CardFooter, CardHeader, Image, Input } from '@nextui-org/react';
 import { FunctionComponent, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 const Login: FunctionComponent = () => {
   const dispatch = useAppDispatch();
+  const location = useLocation();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState('');
@@ -25,8 +26,21 @@ const Login: FunctionComponent = () => {
         toast.success(response.message);
 
         dispatch(setUserEmail(email));
+
+        // if state was passed handle that
+        const fromRoute = location.state?.from;
+
+        const otpRoute = RoutePath.otp(response.data.otp_token);
         // redirect to OTP page
-        navigate(RoutePath.otp(response.data.otp_token));
+        navigate(otpRoute, {
+          ...(fromRoute
+            ? {
+                state: {
+                  from: fromRoute,
+                },
+              }
+            : {}),
+        });
       } else {
         toast.error(response.message);
       }
@@ -40,7 +54,6 @@ const Login: FunctionComponent = () => {
       <CardHeader className="flex flex-col items-center gap-3">
         <Image src={EspektroLogo} alt="Espektro Logo" width={40} height={40} className="rounded-full" />
         <p className="text-end text-2xl">Welcome to Tessarus</p>
-        <p className="text-end text-sm text-default-500">Enter your tessarus credentials</p>
       </CardHeader>
       <CardBody className="flex justify-center">
         <Input
