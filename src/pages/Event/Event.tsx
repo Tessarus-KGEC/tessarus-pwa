@@ -44,7 +44,24 @@ const Event: React.FC = () => {
       refetchOnMountOrArgChange: true,
     },
   );
-  const { data: eventRecommendationData, isLoading: eventRecommendationLoading } = useGetEventsRecommendationQuery();
+
+  console.log(eventData?.status === 200 ? eventData?.data?.eventOrganiserClub : null);
+
+  const { data: eventRecommendationData, isLoading: eventRecommendationLoading } = useGetEventsRecommendationQuery(
+    {
+      page: 1,
+      limit: 20,
+      organisingClub:
+        eventData?.status === 200
+          ? Object.entries(ORGANISING_CLUB_MAP).find(([key, value]) => value === eventData.data.eventOrganiserClub.name)?.[0]
+          : undefined,
+    },
+    {
+      refetchOnMountOrArgChange: true,
+      skip: !eventData,
+    },
+  );
+
   const { data: eventTicket } = useGetTicketByEventQuery(
     { eventId: eventId ?? '' },
     {
@@ -261,7 +278,7 @@ const Event: React.FC = () => {
         </div>
       </article>
       <article className="w-full sm:max-w-[300px]">
-        <h2 className="text-xl font-semibold">Recommanded events</h2>
+        <h2 className="text-xl font-semibold">Recommended Events</h2>
         <>
           {eventRecommendationLoading ? (
             <div>Loading...</div>
