@@ -105,7 +105,7 @@ const Sidebar: FunctionComponent<{
       {
         title: 'Wallet',
         route: Route.WALLET,
-        status: isMobile ? 'active' : 'inactive',
+        status: 'active',
         slug: Routes[Route.WALLET].slug,
         icon: <IoWalletOutline size={20} />,
         permissions: Routes[Route.WALLET].permissions,
