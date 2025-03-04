@@ -14,6 +14,16 @@ export interface UserSelfResponse extends User {}
 
 export interface EventCoordinatorsResponse extends Pick<User, '_id' | 'name' | 'email' | 'isFromKGEC' | 'isVolunteer' | 'profileImageUrl'> {}
 
+export interface LeaderboardContestantsQuery {
+  page: number;
+  limit: number;
+}
+export interface LeaderboardContestantsResponse {
+  total: number;
+  list: (Pick<User, '_id' | 'name' | 'email' | 'isFromKGEC' | 'profileImageUrl' | 'score'> & { rank: number })[];
+  rank?: number;
+}
+
 export interface PushSubscriptionPublicKeyResponse {
   publicKey: string;
 }

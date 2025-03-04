@@ -7,6 +7,7 @@ import Analytics from './pages/Analytics';
 import Checkin from './pages/CheckIn';
 import Event from './pages/Event/Event';
 import Events from './pages/Events/Events';
+import LeaderboardPage from './pages/Leaderboard/Leaderboard';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
 import Otp from './pages/Otp';
@@ -85,6 +86,10 @@ const appRouter = createBrowserRouter([
           {
             path: Route.USER_MANAGEMENT,
             element: <UserManagement />,
+          },
+          {
+            path: Route.LEADERBOARD,
+            element: <LeaderboardPage />,
           },
         ],
       },

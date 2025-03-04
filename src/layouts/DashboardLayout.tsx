@@ -22,7 +22,7 @@ import {
   IoTicketOutline,
   IoWalletOutline,
 } from 'react-icons/io5';
-import { MdInstallMobile, MdOutlineAdminPanelSettings, MdOutlineEvent } from 'react-icons/md';
+import { MdInstallMobile, MdLeaderboard, MdOutlineAdminPanelSettings, MdOutlineEvent } from 'react-icons/md';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { PointsDescriptionMap } from '../constants';
 import useMediaQuery from '../hooks/useMedia';
@@ -120,6 +120,15 @@ const Sidebar: FunctionComponent<{
       //   permissions: Routes[Route.ANALYTICS].permissions,
       //   protected: true,
       // },
+      {
+        title: 'Leaderboard',
+        route: Route.LEADERBOARD,
+        status: isMobile ? 'inactive' : 'active',
+        slug: Routes[Route.LEADERBOARD].slug,
+        icon: <MdLeaderboard size={20} />,
+        permissions: Routes[Route.LEADERBOARD].permissions,
+        protected: true,
+      },
       {
         title: 'Transactions',
         route: Route.TRANSACTIONS,
