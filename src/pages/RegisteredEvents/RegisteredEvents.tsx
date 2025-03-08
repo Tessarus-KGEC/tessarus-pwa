@@ -2,6 +2,9 @@ import { ScrollShadow } from '@nextui-org/react';
 import axios, { AxiosError } from 'axios';
 import { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+import InfiniteScroll from 'react-infinite-scroll-component';
+import LoadingLottie from '../../components/Loading';
+import NoResults from '../../components/NoResults';
 import Spinner from '../../components/Spinner';
 import useMediaQuery from '../../hooks/useMedia';
 import { useAppDispatch, useAppSelector } from '../../redux';
@@ -79,72 +82,41 @@ const RegisteredEvents: FunctionComponent = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
-  const lastEventCardRef = useCallback(
-    (node: HTMLLIElement) => {
-      if (isFetchingMoreEvents) return;
-      if (!hasMore) return;
-      if (observer.current) observer.current.disconnect();
-
-      observer.current = new IntersectionObserver(
-        (entries) => {
-          if (entries[0].isIntersecting && hasMore) {
-            setPage((prevPage) => prevPage + 1);
-          }
-        },
-        {
-          root: eventPageRef.current,
-          threshold: 1,
-          rootMargin: '0px',
-        },
-      );
-
-      if (node) observer.current.observe(node);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isFetchingMoreEvents, hasMore],
-  );
-
   useEffect(() => {
     dispatch(setNavbarHeaderTitle(isMobile ? 'Registered events' : null));
   }, [isMobile, dispatch]);
 
   return (
     <div ref={eventPageRef} className="flex h-full flex-1 flex-grow-0 flex-col gap-4">
-      <div className="space-y-4 px-4">
-        {!isMobile ? <h1 className="text-2xl">Registered events</h1> : null}
-        {/* 
-        <div className="flex gap-4">
-          <SearchBar placeholder={`Search your registered event...`} />
-          <Button isIconOnly color="default" aria-label="Like" onClick={() => setIsFilterOpened(!isFilterOpened)}>
-            <IoFilter size={24} />
-          </Button>
-        </div> */}
+      <div className="space-y-4 px-4">{!isMobile ? <h1 className="text-2xl">Registered events</h1> : null}</div>
+      <div id="registeredEventsInfiniteScoller" className="h-full overflow-auto">
+        <ScrollShadow size={20}>
+          <InfiniteScroll
+            dataLength={events.length}
+            next={() => setPage((prev) => prev + 1)}
+            hasMore={hasMore}
+            loader={
+              <div>
+                <LoadingLottie size={100} />
+              </div>
+            }
+            endMessage={
+              <div>
+                <NoResults size={220} />
+              </div>
+            }
+            scrollableTarget="registeredEventsInfiniteScoller"
+          >
+            <ul className="relative grid flex-1 grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4 overflow-y-auto !px-4">
+              {events.map((event) => (
+                <li key={event._id} className="">
+                  <EventCard event={event} isFromKGEC={user?.isFromKGEC} />
+                </li>
+              ))}
+            </ul>
+          </InfiniteScroll>
+        </ScrollShadow>
       </div>
-      {/* {loading && <p>Loading...</p>} */}
-      <ScrollShadow size={20}>
-        <ul ref={eventListRef} className="relative grid flex-1 grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4 overflow-y-auto !px-4 !pb-12">
-          {events.length > 0 &&
-            events.map((event) => (
-              <li ref={events.length === events.indexOf(event) + 1 ? lastEventCardRef : null} key={event._id} className="">
-                <EventCard event={event} isFromKGEC={user?.isFromKGEC} />
-              </li>
-            ))}
-          <li className="absolute bottom-0 left-0 right-0 flex justify-center py-2 text-center text-default-500">
-            <p className="flex items-center space-x-4 px-2">
-              {isFetchingMoreEvents ? (
-                <>
-                  <Spinner width="25" />
-                  <span>Loading more events...</span>
-                </>
-              ) : hasMore ? (
-                <>Scroll to load more events</>
-              ) : (
-                <>No more events</>
-              )}
-            </p>
-          </li>
-        </ul>
-      </ScrollShadow>
     </div>
   );
 };
