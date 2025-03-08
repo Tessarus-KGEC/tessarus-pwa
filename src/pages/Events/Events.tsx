@@ -4,7 +4,10 @@ import axios, { AxiosError } from 'axios';
 import { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { IoAdd, IoFilter } from 'react-icons/io5';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import { useSearchParams } from 'react-router-dom';
+import LoadingLottie from '../../components/Loading';
+import NoResults from '../../components/NoResults';
 import SearchBar from '../../components/SearchBar';
 import Spinner from '../../components/Spinner';
 import { PERMISSIONS } from '../../constants';
@@ -33,11 +36,6 @@ const Events: FunctionComponent = () => {
   const [page, setPage] = useState(1);
   const [isFetchingMoreEvents, setFetchingMoreEvents] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-
-  const eventPageRef = useRef<HTMLDivElement>(null);
-  const eventListRef = useRef<HTMLUListElement>(null);
-
-  const observer = useRef<IntersectionObserver | null>(null);
 
   const debouncedSearch = useDebounceSearch({
     query: searchQuery,
@@ -78,23 +76,6 @@ const Events: FunctionComponent = () => {
     }
   };
 
-  // const loadMoreEvents = async () => {
-  //   setFetchingMoreEvents(true);
-  //   const data = await fetchEvents({ page, limit: 10 });
-  //   if (data) {
-  //     const newEventsSet = new Set([...events, ...data.events]);
-  //     setEvents(Array.from(newEventsSet));
-  //     setHasMore(data.hasMore);
-  //   }
-  //   setFetchingMoreEvents(false);
-  // };
-
-  // useEffect(() => {
-  //   console.log('fetching');
-  //   loadMoreEvents();
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [page, searchParams]);
-
   useEffect(() => {
     const fetchNewEvents = async () => {
       setFetchingMoreEvents(true);
@@ -118,41 +99,21 @@ const Events: FunctionComponent = () => {
     fetchNewEvents();
   }, [searchParams, page, user?.isFromKGEC, debouncedSearch]);
 
-  const lastEventCardRef = useCallback(
-    (node: HTMLLIElement) => {
-      if (isFetchingMoreEvents) return;
-      if (!hasMore) return;
-      if (observer.current) observer.current.disconnect();
-
-      observer.current = new IntersectionObserver(
-        (entries) => {
-          if (entries[0].isIntersecting && hasMore) {
-            setPage((prevPage) => prevPage + 1);
-          }
-        },
-        {
-          root: eventPageRef.current,
-          threshold: 1,
-          rootMargin: '50px',
-        },
-      );
-
-      if (node) observer.current.observe(node);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [isFetchingMoreEvents, hasMore],
-  );
-
   useEffect(() => {
     dispatch(setNavbarHeaderTitle(isMobile ? 'Events' : null));
   }, [isMobile, dispatch]);
 
   return (
-    <div ref={eventPageRef} className="flex h-full flex-1 flex-grow-0 flex-col gap-4">
+    <div className="flex h-full flex-1 flex-grow-0 flex-col gap-4">
       <div className="space-y-4 px-4">
         {!isMobile ? <h1 className={`text-2xl`}>Events</h1> : null}
         <div className="flex gap-4">
-          <SearchBar placeholder={`Search your favorite event...`} className="max-w-[450px]" onChange={(e) => setSearchQuery(e.target.value)} />
+          <SearchBar
+            placeholder={`Search your favorite event...`}
+            className="max-w-[450px]"
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onClear={() => setSearchQuery('')}
+          />
           <Button color="default" aria-label="Like" onClick={() => setIsFilterOpened(!isFilterOpened)}>
             <IoFilter size={20} />
             Filters
@@ -172,33 +133,34 @@ const Events: FunctionComponent = () => {
           )}
         </div>
       </div>
-      {/* {loading && <p>Loading...</p>} */}
-      <ScrollShadow size={20}>
-        <ul ref={eventListRef} className="relative grid flex-1 grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4 overflow-y-auto !px-4 !pb-12">
-          {events.length > 0 &&
-            events.map((event) => (
-              <li ref={events.length === events.indexOf(event) + 1 ? lastEventCardRef : null} key={event._id} className="">
-                <EventCard event={event} isFromKGEC={user?.isFromKGEC} />
-              </li>
-            ))}
-          <li className="absolute bottom-0 left-0 right-0 flex justify-center py-2 text-center text-default-500">
-            <p className="flex items-center space-x-4 px-2">
-              {isFetchingMoreEvents ? (
-                <>
-                  <Spinner width="25" />
-                  <span>Loading more events...</span>
-                </>
-              ) : hasMore ? (
-                <>Scroll to load more events</>
-              ) : (
-                <>No more events</>
-              )}
-            </p>
-          </li>
-        </ul>
-      </ScrollShadow>
-
-      {/* Fillter form */}
+      <div id="eventsInfiniteScroller" className="h-full overflow-auto">
+        <ScrollShadow size={20}>
+          <InfiniteScroll
+            dataLength={events.length}
+            next={() => setPage((prev) => prev + 1)}
+            hasMore={hasMore}
+            loader={
+              <div>
+                <LoadingLottie size={100} />
+              </div>
+            }
+            endMessage={
+              <div>
+                <NoResults size={220} />
+              </div>
+            }
+            scrollableTarget="eventsInfiniteScroller"
+          >
+            <ul className="relative grid flex-1 grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4 overflow-y-auto !px-4">
+              {events.map((event) => (
+                <li key={event._id} className="">
+                  <EventCard event={event} isFromKGEC={user?.isFromKGEC} />
+                </li>
+              ))}
+            </ul>
+          </InfiniteScroll>
+        </ScrollShadow>
+      </div>
 
       <FilterForm
         isFilterOpened={isFilterOpened}
