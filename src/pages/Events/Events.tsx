@@ -1,9 +1,9 @@
 import { Button } from '@nextui-org/button';
-import { ScrollShadow } from '@nextui-org/react';
+import { Badge, ScrollShadow } from '@nextui-org/react';
 import axios, { AxiosError } from 'axios';
-import { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
+import { FunctionComponent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import { IoAdd, IoFilter } from 'react-icons/io5';
+import { IoAdd, IoClose, IoFilter } from 'react-icons/io5';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useSearchParams } from 'react-router-dom';
 import LoadingLottie from '../../components/Loading';
@@ -103,6 +103,10 @@ const Events: FunctionComponent = () => {
     dispatch(setNavbarHeaderTitle(isMobile ? 'Events' : null));
   }, [isMobile, dispatch]);
 
+  const isFilterApplied = useMemo(() => {
+    return !!searchParams.size;
+  }, [searchParams]);
+
   return (
     <div className="flex h-full flex-1 flex-grow-0 flex-col gap-4">
       <div className="space-y-4 px-4">
@@ -114,10 +118,12 @@ const Events: FunctionComponent = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             onClear={() => setSearchQuery('')}
           />
-          <Button color="default" aria-label="Like" onClick={() => setIsFilterOpened(!isFilterOpened)}>
-            <IoFilter size={20} />
-            Filters
-          </Button>
+          <Badge color="danger" content={isFilterApplied ? searchParams.size : undefined} size="lg">
+            <Button color={'default'} variant={'flat'} aria-label="Filter" onClick={() => setIsFilterOpened(!isFilterOpened)}>
+              <IoFilter size={20} />
+              Filters
+            </Button>
+          </Badge>
           {!user || !user.isFromKGEC || !user.permissions.includes(PERMISSIONS.CREATE_EVENT) ? null : (
             <Button
               isIconOnly={isMobile}
