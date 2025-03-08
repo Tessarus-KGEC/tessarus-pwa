@@ -12,6 +12,8 @@ import { LeaderboardContestantsResponse } from '../../types/response.type';
 import FirstPosition from '@/assets/first.png';
 import SecondPosition from '@/assets/second.png';
 import ThirdPosition from '@/assets/third.png';
+import LoadingLottie from '../../components/Loading';
+import NoResults from '../../components/NoResults';
 
 const Leaderboard = () => {
   const auth = useAppSelector((state) => state.auth);
@@ -85,11 +87,15 @@ const Leaderboard = () => {
           dataLength={leaderboardData.list.length}
           next={() => setPage((prev) => prev + 1)}
           hasMore={hasMore}
-          loader={<h4>Loading...</h4>}
+          loader={
+            <div>
+              <LoadingLottie size={100} />
+            </div>
+          }
           endMessage={
-            <p style={{ textAlign: 'center' }}>
-              <b>No more results</b>
-            </p>
+            <div>
+              <NoResults size={220} />
+            </div>
           }
           scrollableTarget="leaderboardScrollable"
         >
