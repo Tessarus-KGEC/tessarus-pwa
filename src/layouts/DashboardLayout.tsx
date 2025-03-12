@@ -123,7 +123,7 @@ const Sidebar: FunctionComponent<{
       {
         title: 'Leaderboard',
         route: Route.LEADERBOARD,
-        status: isMobile ? 'inactive' : 'active',
+        status: 'active',
         slug: Routes[Route.LEADERBOARD].slug,
         icon: <MdLeaderboard size={20} />,
         permissions: Routes[Route.LEADERBOARD].permissions,
