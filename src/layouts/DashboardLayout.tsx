@@ -22,7 +22,7 @@ import {
   IoTicketOutline,
   IoWalletOutline,
 } from 'react-icons/io5';
-import { MdInstallMobile, MdOutlineAdminPanelSettings, MdOutlineEvent } from 'react-icons/md';
+import { MdInstallMobile, MdLeaderboard, MdOutlineAdminPanelSettings, MdOutlineEvent } from 'react-icons/md';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { PointsDescriptionMap } from '../constants';
 import useMediaQuery from '../hooks/useMedia';
@@ -105,7 +105,7 @@ const Sidebar: FunctionComponent<{
       {
         title: 'Wallet',
         route: Route.WALLET,
-        status: isMobile ? 'active' : 'inactive',
+        status: 'active',
         slug: Routes[Route.WALLET].slug,
         icon: <IoWalletOutline size={20} />,
         permissions: Routes[Route.WALLET].permissions,
@@ -120,6 +120,15 @@ const Sidebar: FunctionComponent<{
       //   permissions: Routes[Route.ANALYTICS].permissions,
       //   protected: true,
       // },
+      {
+        title: 'Leaderboard',
+        route: Route.LEADERBOARD,
+        status: isMobile ? 'inactive' : 'active',
+        slug: Routes[Route.LEADERBOARD].slug,
+        icon: <MdLeaderboard size={20} />,
+        permissions: Routes[Route.LEADERBOARD].permissions,
+        protected: true,
+      },
       {
         title: 'Transactions',
         route: Route.TRANSACTIONS,
@@ -175,7 +184,7 @@ const Sidebar: FunctionComponent<{
           })}
         </ul>
       </div>
-      <div className="mb-2 mt-auto px-4">
+      <div className="mb-4 mt-auto px-4">
         {user ? (
           <div className="flex gap-2 rounded-2xl border-default bg-foreground-100 p-3 hover:cursor-pointer">
             <Avatar radius="sm" color="secondary" src="https://i.pravatar.cc/150?u=a042581f4e29026704d" size="lg" />
@@ -198,7 +207,7 @@ const Sidebar: FunctionComponent<{
       </div>
       {renderCustomPWAInstallPrompt ? (
         <Button
-          className="mx-4 mb-5 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg"
+          className="mx-4 mb-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg"
           onClick={() => {
             if ('prompt' in renderCustomPWAInstallPrompt) {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any

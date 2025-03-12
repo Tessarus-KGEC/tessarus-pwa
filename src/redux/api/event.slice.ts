@@ -37,9 +37,16 @@ export const eventApi = createApi({
         method: HttpMethod.GET,
       }),
     }),
-    getEventsRecommendation: builder.query<Response<GetAllEventsResponse>, void>({
-      query: () => ({
-        url: '/recommendations',
+    getEventsRecommendation: builder.query<
+      Response<GetAllEventsResponse>,
+      {
+        page: number;
+        limit: number;
+        organisingClub?: string;
+      }
+    >({
+      query: ({ organisingClub, page, limit }) => ({
+        url: `/recommendations${organisingClub ? `?organisingClub=${organisingClub}&` : '?'}page=${page}&limit=${limit}`,
         method: HttpMethod.GET,
       }),
       keepUnusedDataFor: 3600 * 4, // 4 hours

@@ -14,6 +14,16 @@ export interface UserSelfResponse extends User {}
 
 export interface EventCoordinatorsResponse extends Pick<User, '_id' | 'name' | 'email' | 'isFromKGEC' | 'isVolunteer' | 'profileImageUrl'> {}
 
+export interface LeaderboardContestantsQuery {
+  page: number;
+  limit: number;
+}
+export interface LeaderboardContestantsResponse {
+  total: number;
+  list: (Pick<User, '_id' | 'name' | 'email' | 'isFromKGEC' | 'profileImageUrl' | 'score'> & { rank: number })[];
+  rank?: number;
+}
+
 export interface PushSubscriptionPublicKeyResponse {
   publicKey: string;
 }
@@ -36,7 +46,7 @@ export interface IEvent
   > {}
 
 export interface GetAllEventsResponse {
-  events: Pick<
+  events: (Pick<
     EventResponse,
     | '_id'
     | 'title'
@@ -49,8 +59,9 @@ export interface GetAllEventsResponse {
     | 'eventVenue'
     | 'eventThumbnailImage'
     | 'eventType'
-    | 'eventOrganiserClub'
-  >[];
+  > & {
+    eventOrganiserClub: OrganisingClub;
+  })[];
   totalCount: number;
   nextPage: number | null;
   currentPage: number;
@@ -83,7 +94,10 @@ export interface EventResponse {
   eventPrice: number;
   eventPriceForKGEC?: number;
   isEventCancelled?: boolean;
-  eventOrganiserClub: OrganisingClub;
+  eventOrganiserClub: {
+    name: string;
+    logo: string;
+  };
   createdBy: {
     name: string;
     phone: string;

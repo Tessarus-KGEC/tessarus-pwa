@@ -15,6 +15,7 @@ export enum Route {
   USER_MANAGEMENT = 'user-management',
   TRANSACTIONS = 'transactions',
   REGISTERED_EVENTS = `registered`,
+  LEADERBOARD = 'leaderboard',
 }
 
 export const Routes = {
@@ -61,6 +62,10 @@ export const Routes = {
   [Route.USER_MANAGEMENT]: {
     slug: `${dashboardPath}/${Route.USER_MANAGEMENT}`,
     permissions: [PERMISSIONS.ADMIN_READONLY],
+  },
+  [Route.LEADERBOARD]: {
+    slug: `${dashboardPath}/${Route.LEADERBOARD}`,
+    permissions: [],
   },
 };
 
