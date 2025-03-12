@@ -1,11 +1,10 @@
 import { ScrollShadow } from '@nextui-org/react';
 import axios, { AxiosError } from 'axios';
-import { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
+import { FunctionComponent, useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import LoadingLottie from '../../components/Loading';
 import NoResults from '../../components/NoResults';
-import Spinner from '../../components/Spinner';
 import useMediaQuery from '../../hooks/useMedia';
 import { useAppDispatch, useAppSelector } from '../../redux';
 import { setNavbarHeaderTitle } from '../../redux/reducers/route.reducer';
@@ -20,13 +19,10 @@ const RegisteredEvents: FunctionComponent = () => {
   // const [isFilterOpened, setIsFilterOpened] = useState(false);
   const [events, setEvents] = useState<IEvent[]>([]);
   const [page, setPage] = useState(1);
-  const [isFetchingMoreEvents, setFetchingMoreEvents] = useState(false);
+  const [, setFetchingMoreEvents] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
   const eventPageRef = useRef<HTMLDivElement>(null);
-  const eventListRef = useRef<HTMLUListElement>(null);
-
-  const observer = useRef<IntersectionObserver | null>(null);
 
   const fetchEvents = async ({ page, limit }: { page: number; limit: number }) => {
     try {

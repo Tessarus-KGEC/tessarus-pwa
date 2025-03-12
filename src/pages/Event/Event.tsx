@@ -53,7 +53,7 @@ const Event: React.FC = () => {
       limit: 20,
       organisingClub:
         eventData?.status === 200
-          ? Object.entries(ORGANISING_CLUB_MAP).find(([key, value]) => value === eventData.data.eventOrganiserClub.name)?.[0]
+          ? Object.entries(ORGANISING_CLUB_MAP).find(([, value]) => value === eventData.data.eventOrganiserClub.name)?.[0]
           : undefined,
     },
     {

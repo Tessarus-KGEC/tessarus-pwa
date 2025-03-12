@@ -1,15 +1,14 @@
 import { Button } from '@nextui-org/button';
 import { Badge, ScrollShadow } from '@nextui-org/react';
 import axios, { AxiosError } from 'axios';
-import { FunctionComponent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { FunctionComponent, useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
-import { IoAdd, IoClose, IoFilter } from 'react-icons/io5';
+import { IoAdd, IoFilter } from 'react-icons/io5';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useSearchParams } from 'react-router-dom';
 import LoadingLottie from '../../components/Loading';
 import NoResults from '../../components/NoResults';
 import SearchBar from '../../components/SearchBar';
-import Spinner from '../../components/Spinner';
 import { PERMISSIONS } from '../../constants';
 import useDebounceSearch from '../../hooks/useDebounce';
 import useMediaQuery from '../../hooks/useMedia';
@@ -34,7 +33,7 @@ const Events: FunctionComponent = () => {
   const [isCreateEventFormOpen, setIsCreateEventFormOpen] = useState(false);
   const [events, setEvents] = useState<IEvent[]>([]);
   const [page, setPage] = useState(1);
-  const [isFetchingMoreEvents, setFetchingMoreEvents] = useState(false);
+  const [, setFetchingMoreEvents] = useState(false);
   const [hasMore, setHasMore] = useState(true);
 
   const debouncedSearch = useDebounceSearch({

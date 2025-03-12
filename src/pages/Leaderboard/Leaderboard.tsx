@@ -23,7 +23,7 @@ const Leaderboard = () => {
     total: 0,
     list: [],
   });
-  const [isFetchingMore, setFetchingMore] = useState(false);
+  const [, setFetchingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const limit = 30; // Adjust as needed
 
