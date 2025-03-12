@@ -34,6 +34,7 @@ const RegisteredEvents: FunctionComponent = () => {
 
       if (!authToken) return null;
 
+      
       const resp = await axios.get<{
         data: {
           events: IEvent[];
