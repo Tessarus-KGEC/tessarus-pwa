@@ -38,7 +38,7 @@ const EventCard: React.FC<IProps> = ({ event, isFromKGEC }) => {
           src={event.eventThumbnailImage}
         />
       </CardHeader>
-      <CardBody className="space-y-2">
+      <CardBody className="space-y-3">
         <div className="flex gap-x-2">
           <h2 className="text-lg font-semibold">{event.title}</h2>
           <Chip
@@ -56,15 +56,15 @@ const EventCard: React.FC<IProps> = ({ event, isFromKGEC }) => {
         <p className="text-sm text-default-500">{event.description.length > 100 ? `${event.description.slice(0, 80)}...` : event.description}</p>
         <p className="text-sm text-default-foreground">
           <div className="flex items-center space-x-3">
-            <IoCalendar size={22} className="text-default-500" />
+            <IoCalendar size={18} className="text-default-500" />
             <div>
               <div className="text-default-500">From Date</div>
-              <div className="font-semibold">{formateDate(event.startTime)}</div>
+              <div className="font-semibold text-sm">{formateDate(event.startTime)}</div>
             </div>
           </div>
           <span className="pl-2 text-lg leading-3 text-default-500">|</span>
           <div className="flex items-center space-x-3">
-            <IoCalendar size={22} className="text-default-500" />
+            <IoCalendar size={18} className="text-default-500" />
             <div>
               <div className="text-default-500">To Date</div>
               <div className="font-semibold">{formateDate(event.endTime)}</div>

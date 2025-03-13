@@ -117,21 +117,20 @@ const Events: FunctionComponent = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             onClear={() => setSearchQuery('')}
           />
-          <Badge color="danger" content={isFilterApplied ? searchParams.size : undefined} size="lg">
-            <Button color={'default'} variant={'flat'} aria-label="Filter" onClick={() => setIsFilterOpened(!isFilterOpened)}>
+          <Badge color="danger" content={isFilterApplied ? '' : undefined} size="sm">
+            <Button color={'default'} isIconOnly variant={'flat'} aria-label="Filter" onClick={() => setIsFilterOpened(!isFilterOpened)}>
               <IoFilter size={20} />
-              Filters
             </Button>
           </Badge>
           {!user || !user.isFromKGEC || !user.permissions.includes(PERMISSIONS.CREATE_EVENT) ? null : (
             <Button
               isIconOnly={isMobile}
-              color="primary"
-              className={`space-x-2 ${!isMobile ? '!px-6' : ''} ml-auto`}
+              // color="primary"
+              className={`space-x-2 ${!isMobile ? '!px-4' : ''} ml-auto`}
               onClick={() => setIsCreateEventFormOpen(true)}
             >
               <span>
-                <IoAdd size={24} />
+                <IoAdd size={20} />
               </span>
               {!isMobile ? 'Add Event' : null}
             </Button>
@@ -156,7 +155,7 @@ const Events: FunctionComponent = () => {
             }
             scrollableTarget="eventsInfiniteScroller"
           >
-            <ul className="relative grid flex-1 grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4 overflow-y-auto !px-4">
+            <ul className="relative grid flex-1 grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4 overflow-y-auto !px-4">
               {events.map((event) => (
                 <li key={event._id} className="">
                   <EventCard event={event} isFromKGEC={user?.isFromKGEC} />
