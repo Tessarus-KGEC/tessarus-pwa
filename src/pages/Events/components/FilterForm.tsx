@@ -37,11 +37,10 @@ const FilterForm: React.FC<{
   });
 
   return (
-    <Sheet open={isFilterOpened}>
+    <Sheet open={isFilterOpened} onClose={() => setIsFilterOpened(false)}>
       <form
         className="flex h-full flex-col gap-4 py-6"
         onSubmit={handleSubmit((data) => {
-          console.log(data);
           setURLSearchParams(
             Object.fromEntries(
               Object.entries({
