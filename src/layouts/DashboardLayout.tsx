@@ -31,12 +31,11 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
 import { User } from '../types/app.type';
-import { useUpdateUAMUserMutation } from '../redux/api/userManagement.slice';
 import { useUpdateUserDetailsMutation } from '../redux/api/user.slice';
 
 gsap.registerPlugin(useGSAP);
 
-const DetailsCard = ({ title, description }: { title: string; description: keyof User }) => {
+const DetailsCard = ({ title, description }: { title: string; description: string }) => {
   const [editForm, setEditForm] = useState(false);
   return (
     <div className="flex">
@@ -232,7 +231,7 @@ const ViewProfileModal = ({ isOpen, onOpenChange }: { isOpen: boolean; onOpenCha
                         labelPlacement="outside"
                         type="text"
                         label={param.title}
-                        defaultValue={user[param.key]}
+                        defaultValue={user[param.key] as string}
                         {...register(param.key as keyof typeof formValues)}
                         classNames={{
                           input: 'text-[14px]',
@@ -243,7 +242,7 @@ const ViewProfileModal = ({ isOpen, onOpenChange }: { isOpen: boolean; onOpenCha
                 ) : (
                   <div className="mt-6 w-full space-y-6">
                     {editableParams.map((param) => (
-                      <DetailsCard title={param.title} description={user[param.key]} />
+                      <DetailsCard title={param.title} description={user[param.key] as string} />
                     ))}
                   </div>
                 )}
