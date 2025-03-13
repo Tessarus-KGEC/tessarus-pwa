@@ -97,7 +97,7 @@ const ProfileImageCard = ({ url }: { url: string }) => {
         setEditImage(false);
       }
     } catch (error) {
-      toast.error('Error uploading image, no worries event created successfully');
+      toast.error('Error uploading image');
     }
   }
 
