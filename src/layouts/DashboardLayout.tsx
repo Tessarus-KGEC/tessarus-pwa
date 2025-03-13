@@ -413,7 +413,9 @@ const Sidebar: FunctionComponent<{
     <>
       <nav
         id="tessarus-sidebar"
-        className={`flex h-full w-[280px] flex-col gap-4 rounded-br-lg rounded-tr-lg border-red-400 text-default-600 backdrop-blur-sm dark:bg-default-50 xs:w-[300px] ${classname}`}
+        className={`flex h-full w-[280px] flex-col gap-4 rounded-br-lg rounded-tr-lg border-red-400 text-default-600 xs:w-[300px] ${classname}
+        bg-[rgba(60,52,67,0.2)] rounded-2xl shadow-lg shadow-black/10 backdrop-blur-[6.5px]
+        `}
       >
         <div className="flex justify-between gap-4 px-4 py-5 md:px-6">
           <div className="flex items-center gap-2 hover:cursor-pointer" onClick={() => navigate('/dashboard/events')}>
@@ -528,7 +530,7 @@ const DashboardLayout: FunctionComponent = () => {
   return (
     <RouteWrapper>
       <ProtectedLayout>
-        <div className="gradient-background flex h-[100dvh] flex-col lg:flex-row">
+        <div className="flex h-[100dvh] flex-col lg:flex-row">
           {/* header  */}
           <aside
             id="tessarus-sidebar-backdrop"
