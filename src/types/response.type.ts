@@ -186,3 +186,17 @@ export interface DeductWalletAmountResponse {
   amount: number;
   transaction: string;
 }
+
+export interface UpdateUserDetailsArg {
+  name?: string;
+  email?: string;
+  phone?: string;
+  college?: string;
+}
+
+export interface UpdateUserDetailsResponse {
+  name: string;
+  email: string;
+  phone: string;
+  college: string;
+}
