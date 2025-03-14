@@ -10,6 +10,28 @@ export interface VerifyOTPResponse {
   accessToken: string;
 }
 
+export interface VerifyUniversityRollResponse {
+  verified: boolean;
+  email: string;
+  roll: string;
+}
+
+export interface VerifyUniversityRollArgs {
+  roll: string;
+}
+
+export interface SignupUserResponse {}
+
+export interface SignupUserArgs {
+  name: string;
+  email: string;
+  phone: string;
+  college: string;
+  isFromKGEC: boolean;
+  universityRoll?: string;
+  referralCode?: string;
+}
+
 export interface UserSelfResponse extends User {}
 
 export interface EventCoordinatorsResponse extends Pick<User, '_id' | 'name' | 'email' | 'isFromKGEC' | 'isVolunteer' | 'profileImageUrl'> {}

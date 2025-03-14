@@ -3,11 +3,11 @@ export interface User {
   name: string;
   email: string;
   phone: string;
-  gender: string;
+  // gender: string;
   college: string;
-  degree: string;
-  year: number;
-  stream: string;
+  // degree: string;
+  // year: number;
+  // stream: string;
   isVerified: boolean;
   isFromKGEC: boolean;
   isVolunteer: boolean;

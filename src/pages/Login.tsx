@@ -67,10 +67,24 @@ const Login: FunctionComponent = () => {
           onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
         />
       </CardBody>
-      <CardFooter>
+      <CardFooter className='flex flex-col gap-y-4'>
         <Button isLoading={isLoading} color="primary" radius="sm" className="w-full" isDisabled={!email} onClick={() => handleLogin()}>
           Request OTP
         </Button>
+        <div>
+          <p className='text-xs text-foreground mt-4'>don't have an account, 
+            <span onClick={() => {
+              navigate(RoutePath['sign-up']())
+            }} className='ml-1 text-sm text-primary-500 cursor-pointer'>
+              register here
+            </span>
+          </p>
+        </div>
+        {/* <div className='flex items-center w-full gap-x-4'>
+          <div className='h-[1px] bg-white w-3/4'><zdiv>
+          <p>or</p>
+          <div className='h-[1px] bg-white w-3/4'></div>
+        </div> */}
       </CardFooter>
     </Card>
   );
