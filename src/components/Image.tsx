@@ -20,13 +20,13 @@ const ImageComponent: React.FC<{
           alt={alt}
         />
       </div>
-      <img
+      {/* <img
         src={src}
         className={`absolute inset-0 z-0 h-full w-full translate-y-1 scale-105 rounded-large object-cover opacity-30 blur-lg saturate-150 filter`}
         alt={alt}
         data-loaded="true"
         aria-hidden="true"
-      />
+      /> */}
     </div>
   );
 };

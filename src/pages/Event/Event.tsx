@@ -17,6 +17,8 @@ import { setNavbarHeaderTitle } from '../../redux/reducers/route.reducer';
 import { formateDate } from '../../utils/formateDate';
 import PaymentSelectionModal from './components/PaymentSelectionModal';
 import TeamDetailsForm from './components/TeamDetailsForm';
+import LoadingLottie from '../../components/Loading';
+import NotFound from '../NotFound';
 
 export interface ITeamMember
   extends Pick<UserSelfResponse, '_id' | 'name' | 'email' | 'phone' | 'college' | 'espektroId' | 'isFromKGEC' | 'isVolunteer' | 'profileImageUrl'> {}
@@ -44,8 +46,6 @@ const Event: React.FC = () => {
       refetchOnMountOrArgChange: true,
     },
   );
-
-  console.log(eventData?.status === 200 ? eventData?.data?.eventOrganiserClub : null);
 
   const { data: eventRecommendationData, isLoading: eventRecommendationLoading } = useGetEventsRecommendationQuery(
     {
@@ -100,13 +100,15 @@ const Event: React.FC = () => {
   }, [bookedTicketId, isTeamCreated]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <LoadingLottie size={150}/>
+    )
   }
   if (!eventData) {
-    return <div>Invalid Event</div>;
+    return <NotFound/>
   }
   if (eventData.status !== 200) {
-    return <div>Invalid Event</div>;
+    return <NotFound/>
   }
   return (
     <section className="flex flex-col gap-4 overflow-x-hidden px-4 pb-6 sm:flex-row md:gap-6 md:px-6 md:pb-8">

@@ -4,6 +4,8 @@ import {
   LeaderboardContestantsQuery,
   LeaderboardContestantsResponse,
   PushSubscriptionPublicKeyResponse,
+  UpdateUserDetailsArg,
+  UpdateUserDetailsResponse,
   UserSelfResponse,
 } from '@/types/response.type';
 import { RootState } from '@/types/store.type';
@@ -48,7 +50,14 @@ export const userApi = createApi({
         method: HttpMethod.GET,
       }),
     }),
+    updateUserDetails: builder.mutation<Response<UpdateUserDetailsResponse>, UpdateUserDetailsArg>({
+      query: (args) => ({
+        url: '/self',
+        method: HttpMethod.PUT,
+        body: args,
+      }),
+    }),
   }),
 });
 
-export const { useCurrentUserQuery, useGetPushSubscriptionPublicKeyQuery, useGetAllEventCoordinatorsQuery, useGetLeaderboardListQuery } = userApi;
+export const { useCurrentUserQuery, useGetPushSubscriptionPublicKeyQuery, useGetAllEventCoordinatorsQuery, useGetLeaderboardListQuery, useUpdateUserDetailsMutation } = userApi;

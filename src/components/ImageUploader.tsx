@@ -3,6 +3,7 @@ import React, { useMemo, useState } from 'react';
 interface FileUploaderProps {
   onFileDrop: (files: File[]) => void;
   acceptedFileTypes?: AcceptedFileKeys[];
+  classname?: string;
 }
 
 const AcceptedFileTypes = {
@@ -14,7 +15,7 @@ const AcceptedFileTypes = {
 type AcceptedFileKeys = keyof typeof AcceptedFileTypes;
 type AcceptedFileTypes = (typeof AcceptedFileTypes)[keyof typeof AcceptedFileTypes];
 
-const FileUploader: React.FC<FileUploaderProps> = ({ onFileDrop, acceptedFileTypes }) => {
+const FileUploader: React.FC<FileUploaderProps> = ({ onFileDrop, acceptedFileTypes, classname }) => {
   const [, setDropZoneActive] = useState(false);
   function onDragOver(event: React.DragEvent<HTMLDivElement>) {
     event.preventDefault();
@@ -61,7 +62,10 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onFileDrop, acceptedFileTyp
 
   return (
     <div
-      className="flex aspect-video max-w-lg flex-col items-center justify-center rounded-xl border-2 border-dashed border-default-200 bg-default-100"
+      className={
+        classname ??
+        'flex aspect-video max-w-lg flex-col items-center justify-center rounded-xl border-2 border-dashed border-default-200 bg-default-100'
+      }
       onDragOver={onDragOver}
       onDrop={onDrop}
       onDragLeave={() => {
@@ -69,10 +73,10 @@ const FileUploader: React.FC<FileUploaderProps> = ({ onFileDrop, acceptedFileTyp
       }}
     >
       {/* <Icon name="upload_2_line" className={classnames(styles.uploadIcon, dropZoneActive && styles.dropZoneActiveColor)} /> */}
-      <p className="">Drag and Drop here</p>
+      <p className="">Drag and Drop</p>
       <p className="">or</p>
       <label form="drop-down-input-field" className="cursor-pointer">
-        <p className="text-xl font-bold text-primary">Browse Files</p>
+        <p className="text-sm text-blue-500">Browse Files</p>
         <input
           type="file"
           id="drop-down-input-field"

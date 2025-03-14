@@ -50,7 +50,7 @@ const Login: FunctionComponent = () => {
   }
 
   return (
-    <Card className="min-h-[250px] min-w-[320px] gap-4 p-2 pt-6 xs:w-[375px] sm:w-[425px]">
+    <Card className="min-h-[250px] min-w-[300px] gap-4 p-2 pt-6 xs:w-[375px] sm:w-[425px] max-w-[375px]">
       <CardHeader className="flex flex-col items-center gap-3">
         <Image src={EspektroLogo} alt="Espektro Logo" width={40} height={40} className="rounded-full" />
         <p className="text-end text-2xl">Welcome to Tessarus</p>
@@ -67,10 +67,24 @@ const Login: FunctionComponent = () => {
           onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
         />
       </CardBody>
-      <CardFooter>
+      <CardFooter className='flex flex-col gap-y-4'>
         <Button isLoading={isLoading} color="primary" radius="sm" className="w-full" isDisabled={!email} onClick={() => handleLogin()}>
           Request OTP
         </Button>
+        <div>
+          <p className='text-xs text-foreground mt-4'>don't have an account, 
+            <span onClick={() => {
+              navigate(RoutePath['sign-up']())
+            }} className='ml-1 text-sm text-primary-500 cursor-pointer'>
+              register here
+            </span>
+          </p>
+        </div>
+        {/* <div className='flex items-center w-full gap-x-4'>
+          <div className='h-[1px] bg-white w-3/4'><zdiv>
+          <p>or</p>
+          <div className='h-[1px] bg-white w-3/4'></div>
+        </div> */}
       </CardFooter>
     </Card>
   );

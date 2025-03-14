@@ -104,7 +104,7 @@ const RegisteredEvents: FunctionComponent = () => {
             }
             scrollableTarget="registeredEventsInfiniteScoller"
           >
-            <ul className="relative grid flex-1 grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-4 overflow-y-auto !px-4">
+            <ul className="relative grid flex-1 grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4 overflow-y-auto !px-4">
               {events.map((event) => (
                 <li key={event._id} className="">
                   <EventCard event={event} isFromKGEC={user?.isFromKGEC} />
