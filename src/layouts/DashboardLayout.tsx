@@ -207,13 +207,16 @@ const ViewProfileModal = ({ isOpen, onOpenChange }: { isOpen: boolean; onOpenCha
 
   if (!user) return;
 
-
   return (
-    <Modal size="sm" isOpen={isOpen} onOpenChange={(value) => {
-      onOpenChange(value);
-      setIsEditting(false);
-
-    }} className="max-w-[350px] bg-default-50 text-default-foreground dark">
+    <Modal
+      size="sm"
+      isOpen={isOpen}
+      onOpenChange={(value) => {
+        onOpenChange(value);
+        setIsEditting(false);
+      }}
+      className="max-w-[350px] bg-default-50 text-default-foreground dark"
+    >
       <ModalContent>
         {() => (
           <>
@@ -276,7 +279,7 @@ const ViewProfileModal = ({ isOpen, onOpenChange }: { isOpen: boolean; onOpenCha
                             college: response.data.data.college,
                           }),
                         );
-                        setIsEditting(false)
+                        setIsEditting(false);
                       }
                     }}
                   >
@@ -413,8 +416,7 @@ const Sidebar: FunctionComponent<{
     <>
       <nav
         id="tessarus-sidebar"
-        className={`flex h-full w-[280px] flex-col gap-4 rounded-br-lg rounded-tr-lg border-red-400 bg-foreground-50 text-default-600 xs:w-[300px] ${classname}
-        `}
+        className={`flex h-full w-[280px] flex-col gap-4 rounded-br-lg rounded-tr-lg border-red-400 bg-foreground-50 text-default-600 xs:w-[300px] ${classname} `}
       >
         <div className="flex justify-between gap-4 px-4 py-5 md:px-6">
           <div className="flex items-center gap-2 hover:cursor-pointer" onClick={() => navigate('/dashboard/events')}>
@@ -572,7 +574,14 @@ const DashboardLayout: FunctionComponent = () => {
                   </div>
                 ) : (
                   <div className="flex items-center gap-4">
-                    <Button variant="light" className="hidden text-default-600 sm:flex" radius="sm">
+                    <Button
+                      variant="light"
+                      className="hidden text-default-600 sm:flex"
+                      radius="sm"
+                      onClick={() => {
+                        RoutePath['sign-up']();
+                      }}
+                    >
                       Sign up
                     </Button>
                     <Button
