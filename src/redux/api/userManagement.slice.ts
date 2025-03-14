@@ -21,6 +21,7 @@ export const uamApi = createApi({
       return headers;
     },
   }),
+  keepUnusedDataFor: 0,
   endpoints: (builder) => ({
     getUAMUsers: builder.query<Response<GetAllUAMUsersResponse>, GetAllUAMUsersArgs>({
       query: (args) => {
