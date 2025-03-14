@@ -50,7 +50,7 @@ const Login: FunctionComponent = () => {
   }
 
   return (
-    <Card className="min-h-[250px] min-w-[320px] gap-4 p-2 pt-6 xs:w-[375px] sm:w-[425px]">
+    <Card className="min-h-[250px] min-w-[300px] gap-4 p-2 pt-6 xs:w-[375px] sm:w-[425px] max-w-[375px]">
       <CardHeader className="flex flex-col items-center gap-3">
         <Image src={EspektroLogo} alt="Espektro Logo" width={40} height={40} className="rounded-full" />
         <p className="text-end text-2xl">Welcome to Tessarus</p>

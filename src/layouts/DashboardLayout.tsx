@@ -413,8 +413,7 @@ const Sidebar: FunctionComponent<{
     <>
       <nav
         id="tessarus-sidebar"
-        className={`flex h-full w-[280px] flex-col gap-4 rounded-br-lg rounded-tr-lg border-red-400 text-default-600 xs:w-[300px] ${classname}
-        bg-[rgba(60,52,67,0.2)] rounded-2xl shadow-lg shadow-black/10 backdrop-blur-[6.5px]
+        className={`flex h-full w-[280px] flex-col gap-4 rounded-br-lg rounded-tr-lg border-red-400 bg-foreground-50 text-default-600 xs:w-[300px] ${classname}
         `}
       >
         <div className="flex justify-between gap-4 px-4 py-5 md:px-6">
